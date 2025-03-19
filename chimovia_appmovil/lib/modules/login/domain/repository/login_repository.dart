@@ -1,3 +1,5 @@
+import 'package:chimovia_appmovil/modules/login/domain/entities/login.dart';
+
 abstract class LoginRepository {
-  Future<String> login(String email, String password);
+  Future<LoginRespuesta> login(String email, String password);
 }

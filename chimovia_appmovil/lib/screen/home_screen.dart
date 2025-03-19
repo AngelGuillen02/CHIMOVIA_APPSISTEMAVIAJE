@@ -1,4 +1,10 @@
+import 'package:chimovia_appmovil/modules/colaboradores/bloc/colaboradores_bloc_bloc.dart';
+import 'package:chimovia_appmovil/modules/colaboradores/bloc/colaboradores_bloc_state.dart';
+import 'package:chimovia_appmovil/modules/colaboradores/presentation/colaboradores_screen.dart';
+import 'package:chimovia_appmovil/modules/login/presentation/login.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,7 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Drawer Navigation App',
+      title: 'CHIMOVIA APP',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primaryColor: primaryColor,
@@ -55,7 +61,7 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _screens = [
     const home_screens(),
-    const ColaboradoresScreen(),
+    CollaboratorsScreen(),
     const AsignacionesScreen(),
     const ViajesScreen(),
   ];
@@ -69,28 +75,35 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: AppBar(
-        title: _getTitleForIndex(_selectedIndex),
-        leading: IconButton(
-          icon: const Icon(Icons.menu, color: Color.fromARGB(255, 0, 0, 0)),
-          onPressed: () {
-            _scaffoldKey.currentState?.openDrawer();
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<ColaboradoresBloc, ColaboradoresState>(
+          listener: (context, state) {
+            // TODO: implement listener
           },
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_none_outlined),
-            onPressed: () {},
+
+         //Agregar nuevos bloc listener aqui
+
+        
+      ],
+      child: Scaffold(
+        key: _scaffoldKey,
+        appBar: AppBar(
+          title: _getTitleForIndex(_selectedIndex),
+          leading: IconButton(
+            icon: const Icon(Icons.menu, color: Color.fromARGB(255, 0, 0, 0)),
+            onPressed: () {
+              _scaffoldKey.currentState?.openDrawer();
+            },
           ),
-        ],
+        ),
+        drawer: AppDrawer(
+          selectedIndex: _selectedIndex,
+          onItemSelected: _onItemTapped,
+        ),
+        body: _screens[_selectedIndex],
       ),
-      drawer: AppDrawer(
-        selectedIndex: _selectedIndex,
-        onItemSelected: _onItemTapped,
-      ),
-      body: _screens[_selectedIndex],
     );
   }
 
@@ -168,9 +181,14 @@ class AppDrawer extends StatelessWidget {
                 children: [
                   const Icon(Icons.logout, color: secondaryTextColor),
                   const SizedBox(width: 10),
-                  const Text(
-                    'Cerrar sesión',
-                    style: TextStyle(color: secondaryTextColor),
+                  GestureDetector(
+                    onTap: () {
+                      context.go('/');
+                    },
+                    child: const Text(
+                      'Cerrar sesión',
+                      style: TextStyle(color: secondaryTextColor),
+                    ),
                   ),
                 ],
               ),
@@ -188,10 +206,7 @@ class AppDrawer extends StatelessWidget {
   }) {
     final bool isSelected = selectedIndex == index;
     return ListTile(
-      leading: Icon(
-        icon,
-        color: isSelected ? accentColor : secondaryTextColor,
-      ),
+      leading: Icon(icon, color: isSelected ? accentColor : secondaryTextColor),
       title: Text(
         title,
         style: TextStyle(
@@ -201,9 +216,7 @@ class AppDrawer extends StatelessWidget {
       ),
       onTap: () => onItemSelected(index),
       tileColor: isSelected ? accentColor.withOpacity(0.1) : null,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
       minLeadingWidth: 24,
     );
@@ -222,13 +235,17 @@ class home_screens extends StatelessWidget {
   }
 }
 
-class ColaboradoresScreen extends StatelessWidget {
-  const ColaboradoresScreen({Key? key}) : super(key: key);
+class CollaboratorsScreenState extends StatelessWidget {
+  const CollaboratorsScreenState({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return const Center(
-      child: Text("Pantalla de Colaboradores", style: TextStyle(color: Colors.black)),
+      child: Text(
+        "Pantalla de Colaboradores",
+        style: TextStyle(color: Colors.black),
+        //context.go('/colaboradores');
+      ),
     );
   }
 }
@@ -239,7 +256,10 @@ class AsignacionesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Center(
-      child: Text("Pantalla de Asignaciones", style: TextStyle(color: Colors.black)),
+      child: Text(
+        "Pantalla de Asignaciones",
+        style: TextStyle(color: Colors.black),
+      ),
     );
   }
 }
