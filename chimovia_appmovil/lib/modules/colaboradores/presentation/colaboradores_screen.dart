@@ -19,9 +19,7 @@ class CollaboratorsScreenState extends State<CollaboratorsScreen> {
   @override
   void initState() {
     super.initState();
-    // Load the collaborators when the screen is first initialized
-    BlocProvider.of<ColaboradoresBloc>(context).add(LoadColaboradores());
-    //context.read<ColaboradoresBloc>().add(LoadColaboradores());
+    context.read<ColaboradoresBloc>().add(LoadColaboradores());
   }
 
   List<Dato> get _filteredCollaborators {
@@ -43,12 +41,20 @@ class CollaboratorsScreenState extends State<CollaboratorsScreen> {
   Widget build(BuildContext context) {
     return BlocListener<ColaboradoresBloc, ColaboradoresState>(
       listener: (context, state) {
-        // TODO: implement listener
+        if (state is ColaboradoresError) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.message)));
+        } else if (state is ColaboradoresLoaded) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Colaboradores actualizados')));
+        }
       },
       child: Scaffold(
         appBar: AppBar(
           title: Text(
-            'Collaborators',
+            'Colaborador',
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
           ),
         ),
@@ -59,17 +65,163 @@ class CollaboratorsScreenState extends State<CollaboratorsScreen> {
           ],
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            // Add action for new collaborator
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Add new collaborator pressed')),
-            );
-          },
+          onPressed: () => _showAddCollaboratorDialog(context),
           backgroundColor: Theme.of(context).colorScheme.secondary,
           elevation: 4,
           child: Icon(Icons.add, size: 28),
         ),
       ),
+    );
+  }
+
+  void _showAddCollaboratorDialog(BuildContext context) {
+    final formKey = GlobalKey<FormState>();
+    final nombreController = TextEditingController();
+    final apellidoController = TextEditingController();
+    final identidadController = TextEditingController();
+    final telefonoController = TextEditingController();
+    final emailController = TextEditingController();
+    final sexoController = TextEditingController();
+    final cargoController = TextEditingController();
+    final latitudController = TextEditingController();
+    final longitudController = TextEditingController();
+    String? selectedGender;
+
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Add Collaborator'),
+            content: Form(
+              key: formKey,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextFormField(
+                      controller: nombreController,
+                      decoration: const InputDecoration(
+                        labelText: 'Primer Nombre',
+                      ),
+                      validator:
+                          (value) =>
+                              value!.isEmpty ? 'Primer Nombre es requerido' : null,
+                    ),
+                    TextFormField(
+                      controller: apellidoController,
+                      decoration: const InputDecoration(labelText: 'Last Name'),
+                      validator:
+                          (value) =>
+                              value!.isEmpty ? 'Last name is required' : null,
+                    ),
+                    TextFormField(
+                      controller: identidadController,
+                      decoration: const InputDecoration(labelText: 'Identity'),
+                      validator:
+                          (value) =>
+                              value!.isEmpty ? 'Identity is required' : null,
+                    ),
+                    TextFormField(
+                      controller: telefonoController,
+                      decoration: const InputDecoration(
+                        labelText: 'Phone Number',
+                      ),
+                      validator:
+                          (value) =>
+                              value!.isEmpty
+                                  ? 'Phone number is required'
+                                  : null,
+                    ),
+                    TextFormField(
+                      controller: emailController,
+                      decoration: const InputDecoration(labelText: 'Email'),
+                      validator:
+                          (value) =>
+                              value!.isEmpty ? 'Email is required' : null,
+                    ),
+                    DropdownButtonFormField<String>(
+                      decoration: const InputDecoration(labelText: 'Gender'),
+                      items:
+                          ['M', 'F']
+                              .map(
+                                (gender) => DropdownMenuItem(
+                                  value: gender,
+                                  child: Text(
+                                    gender == 'M' ? 'Male' : 'Female',
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                      onChanged: (value) => selectedGender = value,
+                      validator:
+                          (value) =>
+                              value == null ? 'Gender is required' : null,
+                    ),
+                    TextFormField(
+                      controller: cargoController,
+                      decoration: const InputDecoration(labelText: 'Title'),
+                      validator:
+                          (value) =>
+                              value!.isEmpty ? 'Title is required' : null,
+                    ),
+                    TextFormField(
+                      controller: latitudController,
+                      decoration: const InputDecoration(labelText: 'Latitude'),
+                      keyboardType: TextInputType.number,
+                      validator:
+                          (value) =>
+                              value!.isEmpty ? 'Latitude is required' : null,
+                    ),
+                    TextFormField(
+                      controller: longitudController,
+                      decoration: const InputDecoration(labelText: 'Longitude'),
+                      keyboardType: TextInputType.number,
+                      validator:
+                          (value) =>
+                              value!.isEmpty ? 'Longitude is required' : null,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  if (formKey.currentState!.validate()) {
+                    final nuevoColaborador = Colaboradores(
+                      valido: true,
+                      mensaje: 'Collaborator added',
+                      datos: [
+                        Dato(
+                          colaboradorId: 0,
+                          identidad: identidadController.text,
+                          nombre: nombreController.text,
+                          apellido: apellidoController.text,
+                          telefono: telefonoController.text,
+                          email: emailController.text,
+                          sexo: selectedGender!,
+                          fechaNacimiento: DateTime.now(),
+                          latitud: double.parse(latitudController.text),
+                          longitud: double.parse(longitudController.text),
+                          cargoDescripcion: cargoController.text,
+                          cargoId: 0,
+                        ),
+                      ],
+                    );
+                    context.read<ColaboradoresBloc>().add(
+                      AddColaborador(colaborador: nuevoColaborador),
+                    );
+                    Navigator.pop(context);
+                  }
+                },
+                child: const Text('Save'),
+              ),
+            ],
+          ),
     );
   }
 
@@ -150,7 +302,6 @@ class CollaboratorsScreenState extends State<CollaboratorsScreen> {
   }
 
   Widget _buildCollaboratorCard(Dato collaborator) {
-    //final dateFormat = DateFormat('MMM dd, yyyy');
     return Card(
       margin: EdgeInsets.only(bottom: 16),
       elevation: 2,
@@ -205,11 +356,12 @@ class CollaboratorsScreenState extends State<CollaboratorsScreen> {
           _buildInfoRow('telefono', collaborator.telefono),
           _buildInfoRow(
             'sexo',
-            collaborator.sexo == Sexo.M ? 'Masculino' : 'Femenino',
+            collaborator.sexo == 'M' ? 'Masculino' : 'Femenino',
           ),
-          //_buildInfoRow('Birth Date', dateFormat.format(collaborator.fechaNacimiento)),
-          _buildInfoRow('Cargo', collaborator.cargoDescripcion.toString().split('.').last),
-   
+          _buildInfoRow(
+            'Cargo',
+            collaborator.cargoDescripcion.toString().split('.').last,
+          ),
           _buildInfoRow(
             'Localizacion',
             '${collaborator.latitud ?? "N/A"}, ${collaborator.longitud ?? "N/A"}',
@@ -243,11 +395,11 @@ class CollaboratorsScreenState extends State<CollaboratorsScreen> {
 
   Color _getColorForLetter(String letter) {
     final List<Color> colors = [
-      Color(0xFF2E86C1), // Blue
-      Color(0xFF2ECC71), // Green
-      Color(0xFF16A085), // Teal
-      Color(0xFF3498DB), // Light Blue
-      Color(0xFF27AE60), // Emerald
+      Color(0xFF2E86C1),
+      Color(0xFF2ECC71),
+      Color(0xFF16A085),
+      Color(0xFF3498DB),
+      Color(0xFF27AE60),
     ];
     final int index = letter.codeUnitAt(0) % colors.length;
     return colors[index];

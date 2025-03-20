@@ -13,13 +13,6 @@ class MainApp extends StatelessWidget {
     return  MaterialApp.router(
       routerConfig: appRoutes,
       debugShowCheckedModeBanner: false,
-
-      // BlocProvider(
-      //   create: (context) => ColaboradorBloc(
-      //     repository: ColaboradorDataSource(),
-      //   )..add(LoadColaboradores()),
-      //   child: ColaboradorListScreen(),
-      // )
     );
   }
 }

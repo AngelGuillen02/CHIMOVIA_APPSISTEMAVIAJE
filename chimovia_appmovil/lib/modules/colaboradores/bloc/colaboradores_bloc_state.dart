@@ -15,7 +15,6 @@ class ColaboradoresLoaded extends ColaboradoresState {
   ColaboradoresLoaded({required this.colaboradores});
 }
 
-
 class ColaboradoresError extends ColaboradoresState {
   final String message;
 

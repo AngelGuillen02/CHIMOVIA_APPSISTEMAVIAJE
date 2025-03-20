@@ -39,12 +39,11 @@ Future<List<Colaboradores>> getColaboradores() async {
     try {
       final response = await _dio.post(
         '${EnviromentApi.apiUrl}/colaboradores/CrearColaborador',
-        data: colaborador.toJson(),
+        data: colaborador.datos.first.toJson(),
         options: Options(
           headers: {'Content-Type': 'application/json'},
         ),
       );
-
       if (response.statusCode != 200) {
         throw CustomException('Error al agregar colaborador');
       }

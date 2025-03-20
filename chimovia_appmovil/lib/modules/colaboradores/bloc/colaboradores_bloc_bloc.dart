@@ -10,27 +10,30 @@ class ColaboradoresBloc extends Bloc<ColaboradoresEvent, ColaboradoresState> {
   ColaboradoresBloc({required this.repository})
     : super(ColaboradoresInitial()) {
     // Cargar colaboradores
-   on<LoadColaboradores>((event, emit) async {
-     emit(ColaboradoresLoading());
-    try {
+    on<LoadColaboradores>((event, emit) async {
+      emit(ColaboradoresLoading());
+      try {
         final colaboradores = await repository.getColaboradores();
-        final listadoDatos = colaboradores.expand((colaborador) => colaborador.datos).toList();
+        final listadoDatos =
+            colaboradores.expand((colaborador) => colaborador.datos).toList();
         emit(ColaboradoresLoaded(colaboradores: listadoDatos));
-    } catch (e) {
+      } catch (e) {
         emit(ColaboradoresError(message: e.toString()));
-    }
+      }
     });
 
     // Agregar colaborador
-    // on<AddColaborador>((event, emit) async {
-    //   emit(ColaboradoresLoading());
-    //   try {
-    //     await repository.addColaborador(event.colaborador);
-    //     final colaboradores = await repository.getColaboradores();
-    //     emit(ColaboradoresLoaded(colaboradores: colaboradores));
-    //   } catch (e) {
-    //     emit(ColaboradoresError(message: e.toString()));
-    //   }
-    // });
+    on<AddColaborador>((event, emit) async {
+      emit(ColaboradoresLoading());
+      try {
+        await repository.addColaborador(event.colaborador);
+        final colaboradores = await repository.getColaboradores();
+        final listadoDatos =
+            colaboradores.expand((colaborador) => colaborador.datos).toList();
+        emit(ColaboradoresLoaded(colaboradores: listadoDatos));
+      } catch (e) {
+        emit(ColaboradoresError(message: e.toString()));
+      }
+    });
   }
 }
