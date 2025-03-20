@@ -1,10 +1,10 @@
 // lib/modules/colaboradores/infraestructure/repository/colaboradores_repository_impl.dart
-import 'package:chimovia_appmovil/modules/colaboradores/domain/datasource/colaborador_datasource.dart';
 import 'package:chimovia_appmovil/modules/colaboradores/domain/entities/colaborador.dart';
 import 'package:chimovia_appmovil/modules/colaboradores/domain/repository/colaborador_repository.dart';
+import 'package:chimovia_appmovil/modules/colaboradores/infraestructure/datasource/colaboradores_datasoruce_implementacion.dart';
 
 class ColaboradoresRepositoryImpl implements ColaboradoresRepository {
-  final ColaboradoresDatasource dataSource;
+  final ColaboradoresDataSourceImpl dataSource;
 
   ColaboradoresRepositoryImpl({required this.dataSource});
 

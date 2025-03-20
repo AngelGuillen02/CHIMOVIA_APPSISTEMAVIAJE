@@ -9,7 +9,6 @@ class ColaboradoresBloc extends Bloc<ColaboradoresEvent, ColaboradoresState> {
 
   ColaboradoresBloc({required this.repository})
     : super(ColaboradoresInitial()) {
-    // Cargar colaboradores
     on<LoadColaboradores>((event, emit) async {
       emit(ColaboradoresLoading());
       try {
@@ -22,7 +21,6 @@ class ColaboradoresBloc extends Bloc<ColaboradoresEvent, ColaboradoresState> {
       }
     });
 
-    // Agregar colaborador
     on<AddColaborador>((event, emit) async {
       emit(ColaboradoresLoading());
       try {

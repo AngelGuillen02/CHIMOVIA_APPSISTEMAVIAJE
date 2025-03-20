@@ -58,17 +58,17 @@ final appRoutes = GoRouter(
 
       name: 'Menu',
     ),
-    GoRoute(
-      path: '/colaboradores',
-      builder: (context, state) => BlocProvider(
-        create: (context) => ColaboradoresBloc(
-          repository: ColaboradoresRepositoryImpl(
-            dataSource: ColaboradoresDataSourceImpl(),
-          ),
-        ),
-        child: const CollaboratorsScreen(),
-      ),
-      name: 'Collaborators',
-    ),
+    // GoRoute(
+    //   path: '/colaboradores',
+    //   builder: (context, state) => BlocProvider(
+    //     create: (context) => ColaboradoresBloc(
+    //       repository: ColaboradoresRepositoryImpl(
+    //         dataSource: ColaboradoresDataSourceImpl(),
+    //       ),
+    //     ),
+    //     child: const CollaboratorsScreen(),
+    //   ),
+    //   name: 'Collaborators',
+    // ),
   ],
 );

@@ -1,6 +1,7 @@
 // lib/modules/colaboradores/infrastructure/datasources/colaboradores_datasource.dart
 import 'dart:convert';
 
+import 'package:chimovia_appmovil/config/enums/respuestas_http.dart';
 import 'package:chimovia_appmovil/config/helpers/custom_exceptions.dart';
 import 'package:chimovia_appmovil/modules/colaboradores/domain/datasource/colaborador_datasource.dart';
 import 'package:chimovia_appmovil/modules/colaboradores/domain/entities/colaborador.dart';
@@ -44,7 +45,7 @@ Future<List<Colaboradores>> getColaboradores() async {
           headers: {'Content-Type': 'application/json'},
         ),
       );
-      if (response.statusCode != 200) {
+      if (response.statusCode != RespuestasHttp.creado.codigo) {
         throw CustomException('Error al agregar colaborador');
       }
     } on DioException catch (e) {

@@ -1,7 +1,8 @@
 import 'package:chimovia_appmovil/modules/colaboradores/bloc/colaboradores_bloc_bloc.dart';
 import 'package:chimovia_appmovil/modules/colaboradores/bloc/colaboradores_bloc_state.dart';
+import 'package:chimovia_appmovil/modules/colaboradores/infraestructure/datasource/colaboradores_datasoruce_implementacion.dart';
+import 'package:chimovia_appmovil/modules/colaboradores/infraestructure/repository/colaborador_repository_implementacion.dart';
 import 'package:chimovia_appmovil/modules/colaboradores/presentation/colaboradores_screen.dart';
-import 'package:chimovia_appmovil/modules/login/presentation/login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -61,7 +62,14 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _screens = [
     const home_screens(),
-    CollaboratorsScreen(),
+    Builder(
+      builder: (context) {
+        return BlocProvider(
+          create: (context) => ColaboradoresBloc(repository: ColaboradoresRepositoryImpl(dataSource: ColaboradoresDataSourceImpl())),
+          child: CollaboratorsScreen(),
+        );
+      },
+    ),
     const AsignacionesScreen(),
     const ViajesScreen(),
   ];
@@ -83,9 +91,7 @@ class _MainScreenState extends State<MainScreen> {
           },
         ),
 
-         //Agregar nuevos bloc listener aqui
-
-        
+        //Agregar nuevos bloc listener aqui
       ],
       child: Scaffold(
         key: _scaffoldKey,

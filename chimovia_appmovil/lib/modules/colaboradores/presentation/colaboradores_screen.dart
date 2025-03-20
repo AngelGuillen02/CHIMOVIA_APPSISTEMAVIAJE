@@ -16,6 +16,12 @@ class CollaboratorsScreenState extends State<CollaboratorsScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
+
+  void agregarColaborador(Colaboradores colaborador) {
+    context.read<ColaboradoresBloc>().add(AddColaborador(colaborador: colaborador));
+    setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
@@ -51,47 +57,62 @@ class CollaboratorsScreenState extends State<CollaboratorsScreen> {
           ).showSnackBar(SnackBar(content: Text('Colaboradores actualizados')));
         }
       },
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            'Colaborador',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-          ),
-        ),
-        body: Column(
-          children: [
-            _buildSearchBar(),
-            Expanded(child: _buildCollaboratorsList()),
-          ],
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => _showAddCollaboratorDialog(context),
-          backgroundColor: Theme.of(context).colorScheme.secondary,
-          elevation: 4,
-          child: Icon(Icons.add, size: 28),
-        ),
+      child: BlocBuilder<ColaboradoresBloc, ColaboradoresState>(
+        builder: (context, state) {
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(
+                'Colaborador',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+              ),
+            ),
+            body: Column(
+              children: [
+                _buildSearchBar(),
+                Expanded(child: _buildCollaboratorsList()),
+              ],
+            ),
+            floatingActionButton: FloatingActionButton(
+              onPressed: () => _showAddCollaboratorDialog(context,agregarColaborador),
+              backgroundColor: Theme.of(context).colorScheme.secondary,
+              elevation: 4,
+              child: Icon(Icons.add, size: 28),
+            ),
+          );
+        },
       ),
     );
   }
 
-  void _showAddCollaboratorDialog(BuildContext context) {
+  void _showAddCollaboratorDialog(BuildContext context, Function(Colaboradores) onAdd) {
     final formKey = GlobalKey<FormState>();
     final nombreController = TextEditingController();
     final apellidoController = TextEditingController();
     final identidadController = TextEditingController();
     final telefonoController = TextEditingController();
     final emailController = TextEditingController();
-    final sexoController = TextEditingController();
+    String? selectedGender;
     final cargoController = TextEditingController();
     final latitudController = TextEditingController();
-    final longitudController = TextEditingController();
-    String? selectedGender;
+    final longitudController = TextEditingController(); // Callback para seleccionar la fecha
+    
+    DateTime?
+    selectedBirthDate; // Variable para almacenar la fecha seleccionada
+    int? selectedCargoId;
+
+    // List of cargos
+    final List<Map<String, dynamic>> _cargos = [
+      {"id": 1, "description": "Chofer"},
+      {"id": 2, "description": "Gerente"},
+      {"id": 3, "description": "Supervisor"},
+      // Add more cargos if needed
+    ];
 
     showDialog(
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('Add Collaborator'),
+            title: const Text('Agregar Colaborador'),
             content: Form(
               key: formKey,
               child: SingleChildScrollView(
@@ -105,80 +126,125 @@ class CollaboratorsScreenState extends State<CollaboratorsScreen> {
                       ),
                       validator:
                           (value) =>
-                              value!.isEmpty ? 'Primer Nombre es requerido' : null,
+                              value!.isEmpty
+                                  ? 'Primer Nombre es requerido'
+                                  : null,
                     ),
                     TextFormField(
                       controller: apellidoController,
-                      decoration: const InputDecoration(labelText: 'Last Name'),
-                      validator:
-                          (value) =>
-                              value!.isEmpty ? 'Last name is required' : null,
-                    ),
-                    TextFormField(
-                      controller: identidadController,
-                      decoration: const InputDecoration(labelText: 'Identity'),
-                      validator:
-                          (value) =>
-                              value!.isEmpty ? 'Identity is required' : null,
-                    ),
-                    TextFormField(
-                      controller: telefonoController,
                       decoration: const InputDecoration(
-                        labelText: 'Phone Number',
+                        labelText: 'Primer Apellido',
                       ),
                       validator:
                           (value) =>
                               value!.isEmpty
-                                  ? 'Phone number is required'
+                                  ? 'Primer Apellido es requerido'
                                   : null,
                     ),
                     TextFormField(
-                      controller: emailController,
-                      decoration: const InputDecoration(labelText: 'Email'),
+                      controller: identidadController,
+                      decoration: const InputDecoration(labelText: 'Identidad'),
                       validator:
                           (value) =>
-                              value!.isEmpty ? 'Email is required' : null,
+                              value!.isEmpty ? 'Identidad es requerido' : null,
+                    ),
+                    TextFormField(
+                      controller: telefonoController,
+                      decoration: const InputDecoration(labelText: 'Telefono'),
+                      validator:
+                          (value) =>
+                              value!.isEmpty ? 'Telefono es requerido' : null,
+                    ),
+                    TextFormField(
+                      controller: emailController,
+                      decoration: const InputDecoration(labelText: 'Correo'),
+                      validator:
+                          (value) =>
+                              value!.isEmpty ? 'Correo es requerido' : null,
                     ),
                     DropdownButtonFormField<String>(
-                      decoration: const InputDecoration(labelText: 'Gender'),
+                      decoration: const InputDecoration(labelText: 'Sexo'),
                       items:
                           ['M', 'F']
                               .map(
                                 (gender) => DropdownMenuItem(
                                   value: gender,
                                   child: Text(
-                                    gender == 'M' ? 'Male' : 'Female',
+                                    gender == 'M' ? 'Masculino' : 'Femenino',
                                   ),
                                 ),
                               )
                               .toList(),
-                      onChanged: (value) => selectedGender = value,
+                      onChanged:
+                          (value) => setState(() {
+                            selectedGender = value;
+                          }),
                       validator:
-                          (value) =>
-                              value == null ? 'Gender is required' : null,
+                          (value) => value == null ? 'Sexo es requerido' : null,
                     ),
-                    TextFormField(
-                      controller: cargoController,
-                      decoration: const InputDecoration(labelText: 'Title'),
+                    DropdownButtonFormField<int>(
+                      decoration: const InputDecoration(labelText: 'Cargo'),
+                      value: selectedCargoId,
+                      items:
+                          _cargos.map((cargo) {
+                            return DropdownMenuItem<int>(
+                              value: cargo['id'],
+                              child: Text(cargo['description']),
+                            );
+                          }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedCargoId = value;
+                        });
+                      },
                       validator:
                           (value) =>
-                              value!.isEmpty ? 'Title is required' : null,
+                              value == null ? 'Seleccione un cargo' : null,
+                    ),
+                    GestureDetector(
+                      onTap: () async {
+                        final selectedDate = await showDatePicker(
+                          context: context,
+                          initialDate: selectedBirthDate ?? DateTime.now(),
+                          firstDate: DateTime(1900),
+                          lastDate: DateTime.now(),
+                        );
+                        if (selectedDate != null) {
+                          setState(() {
+                            selectedBirthDate = selectedDate;
+                            
+                          });
+                        }
+                      },
+                      child: AbsorbPointer(
+                        child: TextFormField(
+                          decoration: InputDecoration(
+                            labelText: 'Fecha de Nacimiento',
+                            hintText:
+                                selectedBirthDate != null
+                                    ? "${selectedBirthDate!.day}/${selectedBirthDate!.month}/${selectedBirthDate!.year}"
+                                    : "Seleccionar Fecha",
+                          ),
+                          // validator: (value) =>
+                          //     value!.isEmpty ? 'Fecha de Nacimiento es requerida' : null,
+                        ),
+                      ),
                     ),
                     TextFormField(
                       controller: latitudController,
-                      decoration: const InputDecoration(labelText: 'Latitude'),
+                      decoration: const InputDecoration(labelText: 'Latitud'),
                       keyboardType: TextInputType.number,
                       validator:
                           (value) =>
-                              value!.isEmpty ? 'Latitude is required' : null,
+                              value!.isEmpty ? 'Latitud es requerido' : null,
                     ),
                     TextFormField(
                       controller: longitudController,
-                      decoration: const InputDecoration(labelText: 'Longitude'),
+                      decoration: const InputDecoration(labelText: 'Longitud'),
                       keyboardType: TextInputType.number,
                       validator:
                           (value) =>
-                              value!.isEmpty ? 'Longitude is required' : null,
+                              value!.isEmpty ? 'Longitud es requerido' : null,
                     ),
                   ],
                 ),
@@ -187,38 +253,52 @@ class CollaboratorsScreenState extends State<CollaboratorsScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel'),
+                child: const Text('Cancelar'),
               ),
               ElevatedButton(
                 onPressed: () {
                   if (formKey.currentState!.validate()) {
-                    final nuevoColaborador = Colaboradores(
-                      valido: true,
-                      mensaje: 'Collaborator added',
-                      datos: [
-                        Dato(
-                          colaboradorId: 0,
-                          identidad: identidadController.text,
-                          nombre: nombreController.text,
-                          apellido: apellidoController.text,
-                          telefono: telefonoController.text,
-                          email: emailController.text,
-                          sexo: selectedGender!,
-                          fechaNacimiento: DateTime.now(),
-                          latitud: double.parse(latitudController.text),
-                          longitud: double.parse(longitudController.text),
-                          cargoDescripcion: cargoController.text,
-                          cargoId: 0,
+                    if (selectedGender != null &&
+                        selectedCargoId != null &&
+                        selectedBirthDate != null) {
+                      final nuevoColaborador = Colaboradores(
+                        valido: true,
+                        mensaje: 'Colaborador agregado',
+                        datos: [
+                          Dato(
+                            colaboradorId: 0,
+                            identidad: identidadController.text,
+                            nombre: nombreController.text,
+                            apellido: apellidoController.text,
+                            telefono: telefonoController.text,
+                            email: emailController.text,
+                            sexo: selectedGender!,
+                            fechaNacimiento: selectedBirthDate!,
+
+                            latitud: double.parse(latitudController.text),
+                            longitud: double.parse(longitudController.text),
+                            cargoDescripcion:
+                                _cargos.firstWhere(
+                                  (cargo) => cargo['id'] == selectedCargoId,
+                                )['description']!,
+                            cargoId: selectedCargoId!,
+                          ),
+                        ],
+                      );
+                      onAdd(nuevoColaborador);
+                      Navigator.pop(context);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Por favor, seleccione todos los campos.',
+                          ),
                         ),
-                      ],
-                    );
-                    context.read<ColaboradoresBloc>().add(
-                      AddColaborador(colaborador: nuevoColaborador),
-                    );
-                    Navigator.pop(context);
+                      );
+                    }
                   }
                 },
-                child: const Text('Save'),
+                child: const Text('Guardar'),
               ),
             ],
           ),
@@ -248,7 +328,7 @@ class CollaboratorsScreenState extends State<CollaboratorsScreen> {
             });
           },
           decoration: InputDecoration(
-            hintText: 'buscar colaborador',
+            hintText: 'Buscar colaborador',
             prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
             suffixIcon:
                 _searchQuery.isNotEmpty
@@ -282,7 +362,7 @@ class CollaboratorsScreenState extends State<CollaboratorsScreen> {
           if (_filteredCollaborators.isEmpty) {
             return Center(
               child: Text(
-                'No collaborators found',
+                'Colaborador no encontrado',
                 style: TextStyle(fontSize: 16, color: Colors.grey[600]),
               ),
             );
@@ -296,7 +376,7 @@ class CollaboratorsScreenState extends State<CollaboratorsScreen> {
             },
           );
         }
-        return Center(child: Text('No collaborators available'));
+        return Center(child: Text('Colaborador no disponible'));
       },
     );
   }
