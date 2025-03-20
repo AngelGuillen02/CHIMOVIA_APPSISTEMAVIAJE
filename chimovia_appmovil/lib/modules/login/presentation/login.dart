@@ -11,31 +11,36 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final _formKey = GlobalKey<FormState>(); 
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final bool _obscurePassword = true;
   bool _isLoading = false;
 
-
-    void _login(String email, String passwword){
-      BlocProvider.of<LoginBlocBloc>(context).add(ClickEnBotonDeIniciarSesion(email: email, password: passwword));
-      setState(() {});
+  void _login(String email, String password) {
+    // Validamos el formulario antes de enviar el evento al Bloc
+    if (_formKey.currentState!.validate()) {
+      BlocProvider.of<LoginBlocBloc>(context).add(
+        ClickEnBotonDeIniciarSesion(email: email.trim(), password: password),
+      );
     }
+  }
 
   @override
   Widget build(BuildContext context) {
     return BlocListener<LoginBlocBloc, LoginBlocState>(
       listener: (context, state) {
-        if(state is LoginBlocLoading){
+        if (state is LoginBlocLoading) {
           setState(() {
             _isLoading = true;
           });
         }
-        if(state is LoginBlocSuccess){
+        if (state is LoginBlocSuccess) {
           context.go('/menu');
         }
-        if(state is LoginBlocFailure){
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
+        if (state is LoginBlocFailure) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.message)),
+          );
           setState(() {
             _isLoading = false;
           });
@@ -43,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
       },
       child: Scaffold(
         body: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
@@ -55,41 +60,44 @@ class _LoginScreenState extends State<LoginScreen> {
               child: SingleChildScrollView(
                 child: Padding(
                   padding: const EdgeInsets.all(30.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        height: 120,
-                        width: 120,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Center(
-                          child: Icon(
-                            Icons.car_repair_outlined,
-                            size: 80,
-                            color: Color(0xFF1A237E),
+                  child: Form(
+                    key: _formKey, // Agregamos el Form aquí
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          height: 120,
+                          width: 120,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Center(
+                            child: Icon(
+                              Icons.car_repair_outlined,
+                              size: 80,
+                              color: Color(0xFF1A237E),
+                            ),
                           ),
                         ),
-                      ),
-                      SizedBox(height: 40),
-                      Text(
-                        "Iniciar Sesión",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
+                        const SizedBox(height: 40),
+                        const Text(
+                          "Iniciar Sesión",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      SizedBox(height: 40),
-                      _buildEmailField(),
-                      SizedBox(height: 20),
-                      _buildPasswordField(),
-                      SizedBox(height: 30),
-                      _buildLoginButton(),
-                      SizedBox(height: 30),
-                    ],
+                        const SizedBox(height: 40),
+                        _buildEmailField(),
+                        const SizedBox(height: 20),
+                        _buildPasswordField(),
+                        const SizedBox(height: 30),
+                        _buildLoginButton(),
+                        const SizedBox(height: 30),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -100,7 +108,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-   Widget _buildEmailField() {
+  Widget _buildEmailField() {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.2),
@@ -108,8 +116,8 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       child: TextFormField(
         controller: _emailController,
-        style: TextStyle(color: Colors.white),
-        decoration: InputDecoration(
+        style: const TextStyle(color: Colors.white),
+        decoration: const InputDecoration(
           contentPadding: EdgeInsets.symmetric(vertical: 20),
           border: InputBorder.none,
           hintText: "Correo electrónico",
@@ -117,10 +125,13 @@ class _LoginScreenState extends State<LoginScreen> {
           prefixIcon: Icon(Icons.email_outlined, color: Colors.white70),
         ),
         validator: (value) {
-          if (value == null || value.isEmpty) {
+          if (value == null || value.trim().isEmpty) {
             return 'Por favor ingrese un correo electrónico';
           }
-          return null; 
+          // if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(value)) {
+          //   return 'Por favor ingrese un correo electrónico válido';
+          // }
+          return null;
         },
       ),
     );
@@ -142,18 +153,19 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           elevation: 5,
         ),
-        onPressed: _isLoading ? null : () => _login(_emailController.text, _passwordController.text),
-        child:
-            _isLoading
-                ? CircularProgressIndicator(color: Colors.white)
-                : Text(
-                  "INICIAR SESIÓN",
-                  style: TextStyle(
-                    color: Color(0xFF1A237E),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
+        onPressed: _isLoading
+            ? null
+            : () => _login(_emailController.text, _passwordController.text),
+        child: _isLoading
+            ? const CircularProgressIndicator(color: Colors.white)
+            : const Text(
+                "INICIAR SESIÓN",
+                style: TextStyle(
+                  color: Color(0xFF1A237E),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
                 ),
+              ),
       ),
     );
   }
@@ -167,6 +179,7 @@ class PasswordField extends StatefulWidget {
   @override
   _PasswordFieldState createState() => _PasswordFieldState();
 }
+
 class _PasswordFieldState extends State<PasswordField> {
   bool _isObscure = true;
 
@@ -180,13 +193,13 @@ class _PasswordFieldState extends State<PasswordField> {
       child: TextFormField(
         controller: widget.controller,
         obscureText: _isObscure,
-        style: TextStyle(color: Colors.white),
+        style: const TextStyle(color: Colors.white),
         decoration: InputDecoration(
-          contentPadding: EdgeInsets.symmetric(vertical: 20),
+          contentPadding: const EdgeInsets.symmetric(vertical: 20),
           border: InputBorder.none,
           hintText: "Contraseña",
-          hintStyle: TextStyle(color: Colors.white70),
-          prefixIcon: Icon(Icons.lock_outline, color: Colors.white70),
+          hintStyle: const TextStyle(color: Colors.white70),
+          prefixIcon: const Icon(Icons.lock_outline, color: Colors.white70),
           suffixIcon: GestureDetector(
             onTap: () {
               setState(() {
@@ -194,7 +207,7 @@ class _PasswordFieldState extends State<PasswordField> {
               });
             },
             child: AnimatedSwitcher(
-              duration: Duration(milliseconds: 300),
+              duration: const Duration(milliseconds: 300),
               transitionBuilder: (child, animation) {
                 return ScaleTransition(scale: animation, child: child);
               },
@@ -207,13 +220,15 @@ class _PasswordFieldState extends State<PasswordField> {
           ),
         ),
         validator: (value) {
-          if (value == null || value.isEmpty) {
+          if (value == null || value.trim().isEmpty) {
             return 'Por favor ingrese una contraseña';
           }
-          return null; 
+          // if (value.length < 8) {
+          //   return 'La contraseña debe tener al menos 8 caracteres';
+          // }
+          return null;
         },
       ),
     );
   }
 }
-

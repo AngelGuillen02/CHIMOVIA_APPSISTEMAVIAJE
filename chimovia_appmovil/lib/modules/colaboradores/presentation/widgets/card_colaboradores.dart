@@ -1,7 +1,25 @@
 import 'package:chimovia_appmovil/modules/colaboradores/domain/entities/colaborador.dart';
+import 'package:chimovia_appmovil/modules/colaboradores/presentation/widgets/filas_colaboradores.dart';
 import 'package:flutter/material.dart';
 
-Widget _buildCollaboratorCard(Dato collaborator) {
+
+class CardColaboradores extends StatefulWidget {
+  final Dato colaborador;
+  const CardColaboradores({super.key, required this.colaborador});
+
+  @override
+  State<CardColaboradores> createState() => _CardColaboradoresState();
+}
+
+class _CardColaboradoresState extends State<CardColaboradores> {
+  @override
+  Widget build(BuildContext context) {
+    return _construirCardColaborador(widget.colaborador);
+  }
+}
+
+
+Widget _construirCardColaborador(Dato collaborator) {
     return Card(
       margin: EdgeInsets.only(bottom: 16),
       elevation: 2,
@@ -13,7 +31,7 @@ Widget _buildCollaboratorCard(Dato collaborator) {
         title: Row(
           children: [
             CircleAvatar(
-              backgroundColor: _getColorForLetter(collaborator.nombre[0]),
+              backgroundColor: Colors.blue,
               child: Text(
                 collaborator.nombre[0],
                 style: TextStyle(
@@ -52,19 +70,19 @@ Widget _buildCollaboratorCard(Dato collaborator) {
           ),
         ),
         children: [
-          _buildInfoRow('identidad', collaborator.identidad),
-          _buildInfoRow('telefono', collaborator.telefono),
-          _buildInfoRow(
-            'sexo',
-            collaborator.sexo == 'M' ? 'Masculino' : 'Femenino',
+          FilaColaboradores(label: 'identidad', value: collaborator.identidad),
+          FilaColaboradores(label: 'telefono', value: collaborator.telefono),
+          FilaColaboradores(
+            label: 'sexo',
+            value: collaborator.sexo == 'M' ? 'Masculino' : 'Femenino',
           ),
-          _buildInfoRow(
-            'Cargo',
-            collaborator.cargoDescripcion.toString().split('.').last,
+          FilaColaboradores(
+            label: 'Cargo',
+            value: collaborator.cargoDescripcion.toString().split('.').last,
           ),
-          _buildInfoRow(
-            'Localizacion',
-            '${collaborator.latitud ?? "N/A"}, ${collaborator.longitud ?? "N/A"}',
+          FilaColaboradores(
+            label: 'Localizacion',
+            value: '${collaborator.latitud ?? "N/A"}, ${collaborator.longitud ?? "N/A"}',
           ),
         ],
       ),

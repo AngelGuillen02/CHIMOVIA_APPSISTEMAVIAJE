@@ -1,10 +1,27 @@
 import 'package:chimovia_appmovil/modules/colaboradores/bloc/colaboradores_bloc_bloc.dart';
 import 'package:chimovia_appmovil/modules/colaboradores/bloc/colaboradores_bloc_state.dart';
 import 'package:chimovia_appmovil/modules/colaboradores/domain/entities/colaborador.dart';
+import 'package:chimovia_appmovil/modules/colaboradores/presentation/widgets/card_colaboradores.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-Widget _buildCollaboratorsList(List<Dato> colaboradoresFiltrados) {
+class ListaColaboradores extends StatefulWidget {
+
+  final List<Dato> colaboradoresFiltrados;
+  const ListaColaboradores({super.key, required this.colaboradoresFiltrados});
+
+  @override
+  State<ListaColaboradores> createState() => _ListaColaboradoresState();
+}
+
+class _ListaColaboradoresState extends State<ListaColaboradores> {
+  @override
+  Widget build(BuildContext context) {
+    return _construirListaColaborador(widget.colaboradoresFiltrados);
+  }
+}
+
+Widget _construirListaColaborador(List<Dato> colaboradoresFiltrados) {
     return BlocBuilder<ColaboradoresBloc, ColaboradoresState>(
       builder: (context, state) {
         if (state is ColaboradoresLoading) {
@@ -25,7 +42,7 @@ Widget _buildCollaboratorsList(List<Dato> colaboradoresFiltrados) {
             itemCount: colaboradoresFiltrados.length,
             itemBuilder: (context, index) {
               final collaborator = colaboradoresFiltrados[index];
-              return _buildCollaboratorCard(collaborator);
+              return CardColaboradores(colaborador: collaborator);
             },
           );
         }

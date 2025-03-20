@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 @immutable
 abstract class ColaboradoresState {}
 
-class ColaboradoresInitial extends ColaboradoresState {}
+class ColaboradoresInicial extends ColaboradoresState {}
 
 class ColaboradoresLoading extends ColaboradoresState {}
 
