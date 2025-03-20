@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CollaboratorsScreen extends StatefulWidget {
+  const CollaboratorsScreen({super.key});
+
   @override
   CollaboratorsScreenState createState() => CollaboratorsScreenState();
 }
@@ -64,8 +66,8 @@ class CollaboratorsScreenState extends State<CollaboratorsScreen> {
             );
           },
           backgroundColor: Theme.of(context).colorScheme.secondary,
-          child: Icon(Icons.add, size: 28),
           elevation: 4,
+          child: Icon(Icons.add, size: 28),
         ),
       ),
     );
@@ -94,7 +96,7 @@ class CollaboratorsScreenState extends State<CollaboratorsScreen> {
             });
           },
           decoration: InputDecoration(
-            hintText: 'Search collaborators',
+            hintText: 'buscar colaborador',
             prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
             suffixIcon:
                 _searchQuery.isNotEmpty
@@ -199,24 +201,17 @@ class CollaboratorsScreenState extends State<CollaboratorsScreen> {
           ),
         ),
         children: [
-          _buildInfoRow('ID', collaborator.identidad),
-          _buildInfoRow('Phone', collaborator.telefono),
+          _buildInfoRow('identidad', collaborator.identidad),
+          _buildInfoRow('telefono', collaborator.telefono),
           _buildInfoRow(
-            'Gender',
-            collaborator.sexo == Sexo.M ? 'Male' : 'Female',
+            'sexo',
+            collaborator.sexo == Sexo.M ? 'Masculino' : 'Femenino',
           ),
-          // _buildInfoRow('Birth Date', dateFormat.format(collaborator.fechaNacimiento)),
-          _buildInfoRow('Position ID', collaborator.cargoId.toString()),
+          //_buildInfoRow('Birth Date', dateFormat.format(collaborator.fechaNacimiento)),
+          _buildInfoRow('Cargo', collaborator.cargoDescripcion.toString().split('.').last),
+   
           _buildInfoRow(
-            'Distance',
-            '${collaborator.kms.toStringAsFixed(1)} km',
-          ),
-          _buildInfoRow(
-            'Modified By',
-            collaborator.usuarioModifica?.toString() ?? 'N/A',
-          ),
-          _buildInfoRow(
-            'Location',
+            'Localizacion',
             '${collaborator.latitud ?? "N/A"}, ${collaborator.longitud ?? "N/A"}',
           ),
         ],

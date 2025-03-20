@@ -1,3 +1,3 @@
 class EnviromentApi{
-  static const String apiUrl = 'http://172.29.6.67:45455/api';
+  static const String apiUrl = 'http://192.168.1.17:45455/api';
 }

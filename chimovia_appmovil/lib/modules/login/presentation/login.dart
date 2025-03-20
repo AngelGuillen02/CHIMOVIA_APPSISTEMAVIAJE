@@ -13,7 +13,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _obscurePassword = true;
+  final bool _obscurePassword = true;
   bool _isLoading = false;
 
 
@@ -162,7 +162,7 @@ class _LoginScreenState extends State<LoginScreen> {
 class PasswordField extends StatefulWidget {
   final TextEditingController controller;
 
-  PasswordField({required this.controller});
+  const PasswordField({super.key, required this.controller});
 
   @override
   _PasswordFieldState createState() => _PasswordFieldState();

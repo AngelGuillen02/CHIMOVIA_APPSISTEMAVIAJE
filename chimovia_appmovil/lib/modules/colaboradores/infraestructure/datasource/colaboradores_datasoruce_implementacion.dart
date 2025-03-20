@@ -12,7 +12,7 @@ class ColaboradoresDataSourceImpl implements ColaboradoresDatasource {
   final Dio _dio = Dio();
 
   @override
- Future<List<Colaboradores>> getColaboradores() async {
+Future<List<Colaboradores>> getColaboradores() async {
     try {
       final response = await _dio.get(
         '${EnviromentApi.apiUrl}/colaboradores/ListadoColaboradores',
@@ -21,12 +21,8 @@ class ColaboradoresDataSourceImpl implements ColaboradoresDatasource {
         ),
       );
 
-      List<dynamic> colaboradoresJson = jsonDecode(response.toString())['datos'];
-      List<Colaboradores> colaboradores = colaboradoresJson
-          .map((json) => Colaboradores.fromJson(json))
-          .toList();
-
-      return colaboradores;
+      final colaboradores = Colaboradores.fromJson(jsonDecode(response.toString()));
+      return [colaboradores];
     } on DioException catch (e) {
       String errorMessage = '';
       if (e.response?.statusCode == 404) {
@@ -39,10 +35,10 @@ class ColaboradoresDataSourceImpl implements ColaboradoresDatasource {
   }
 
   @override
-  Future<void> addColaborador(Colaboradores colaborador) async {
+ Future<void> addColaborador(Colaboradores colaborador) async {
     try {
       final response = await _dio.post(
-        '${EnviromentApi.apiUrl}/colaboradores/CrearColaborador', // Ajusta la URL a la correcta para agregar un colaborador
+        '${EnviromentApi.apiUrl}/colaboradores/CrearColaborador',
         data: colaborador.toJson(),
         options: Options(
           headers: {'Content-Type': 'application/json'},

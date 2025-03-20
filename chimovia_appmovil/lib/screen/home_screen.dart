@@ -11,7 +11,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +49,7 @@ const secondaryTextColor = Color.fromARGB(255, 0, 0, 0);
 const drawerColor = Color(0xFF568DF5);
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({Key? key}) : super(key: key);
+  const MainScreen({super.key});
 
   @override
   _MainScreenState createState() => _MainScreenState();
@@ -128,10 +128,10 @@ class AppDrawer extends StatelessWidget {
   final Function(int) onItemSelected;
 
   const AppDrawer({
-    Key? key,
+    super.key,
     required this.selectedIndex,
     required this.onItemSelected,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -225,7 +225,7 @@ class AppDrawer extends StatelessWidget {
 
 // Pantallas individuales
 class home_screens extends StatelessWidget {
-  const home_screens({Key? key}) : super(key: key);
+  const home_screens({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -236,7 +236,7 @@ class home_screens extends StatelessWidget {
 }
 
 class CollaboratorsScreenState extends StatelessWidget {
-  const CollaboratorsScreenState({Key? key}) : super(key: key);
+  const CollaboratorsScreenState({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -251,7 +251,7 @@ class CollaboratorsScreenState extends StatelessWidget {
 }
 
 class AsignacionesScreen extends StatelessWidget {
-  const AsignacionesScreen({Key? key}) : super(key: key);
+  const AsignacionesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -265,7 +265,7 @@ class AsignacionesScreen extends StatelessWidget {
 }
 
 class ViajesScreen extends StatelessWidget {
-  const ViajesScreen({Key? key}) : super(key: key);
+  const ViajesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
