@@ -11,13 +11,12 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _formKey = GlobalKey<FormState>(); 
+  final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
 
   void _login(String email, String password) {
-    // Validamos el formulario antes de enviar el evento al Bloc
     if (_formKey.currentState!.validate()) {
       BlocProvider.of<LoginBlocBloc>(context).add(
         ClickEnBotonDeIniciarSesion(email: email.trim(), password: password),
@@ -39,7 +38,24 @@ class _LoginScreenState extends State<LoginScreen> {
         }
         if (state is LoginBlocFailure) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message)),
+            SnackBar(
+              content: Text(
+                state.message,
+                style: TextStyle(
+                  color: Colors.white, 
+                  fontSize: 14, 
+                ),
+              ),
+              backgroundColor: Colors.red, 
+              duration: Duration(seconds: 3), 
+              behavior:
+                  SnackBarBehavior
+                      .floating, 
+              margin: EdgeInsets.all(10), 
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
           );
           setState(() {
             _isLoading = false;
@@ -61,7 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Padding(
                   padding: const EdgeInsets.all(30.0),
                   child: Form(
-                    key: _formKey, // Agregamos el Form aquí
+                    key: _formKey,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -153,19 +169,21 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           elevation: 5,
         ),
-        onPressed: _isLoading
-            ? null
-            : () => _login(_emailController.text, _passwordController.text),
-        child: _isLoading
-            ? const CircularProgressIndicator(color: Colors.white)
-            : const Text(
-                "INICIAR SESIÓN",
-                style: TextStyle(
-                  color: Color(0xFF1A237E),
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
+        onPressed:
+            _isLoading
+                ? null
+                : () => _login(_emailController.text, _passwordController.text),
+        child:
+            _isLoading
+                ? const CircularProgressIndicator(color: Colors.white)
+                : const Text(
+                  "INICIAR SESIÓN",
+                  style: TextStyle(
+                    color: Color(0xFF1A237E),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
-              ),
       ),
     );
   }

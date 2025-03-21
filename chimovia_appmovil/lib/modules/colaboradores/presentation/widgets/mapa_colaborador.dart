@@ -5,7 +5,7 @@ import 'package:latlong2/latlong.dart';
 class OpenStreetMapScreen extends StatefulWidget {
   final Function(LatLng, String)? onLocationSelected; 
 
-  const OpenStreetMapScreen({Key? key, this.onLocationSelected}) : super(key: key);
+  const OpenStreetMapScreen({super.key, this.onLocationSelected});
 
   @override
   _OpenStreetMapScreenState createState() => _OpenStreetMapScreenState();

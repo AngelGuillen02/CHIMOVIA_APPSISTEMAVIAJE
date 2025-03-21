@@ -18,7 +18,7 @@ class ColaboradorsScreen extends StatefulWidget {
 
   @override
   ColaboradorsScreenState createState() => ColaboradorsScreenState();
-}
+} 
 
 class ColaboradorsScreenState extends State<ColaboradorsScreen> {
   final TextEditingController _buscarController = TextEditingController();
@@ -122,12 +122,12 @@ void _agregarColaboradorShowDialog(
   DateTime? selectedBirthDate;
   LatLng? selectedLocation;
 
-  final List<Map<String, dynamic>> _cargos = [
+  final List<Map<String, dynamic>> cargos = [
     {"id": 3, "descripcion": "Chofer"},
     {"id": 2, "descripcion": "Gerente"},
   ];
 
-  void _openStreetMapScreen() {
+  void openStreetMapScreen() {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -148,7 +148,7 @@ void _agregarColaboradorShowDialog(
     context: context,
     builder: (context) => AlertDialog(
       title: const Text('Agregar Colaborador'),
-      content: Container(
+      content: SizedBox(
         width: MediaQuery.of(context).size.width * 0.9,
         height: MediaQuery.of(context).size.height * 0.8,
         child: Form(
@@ -235,7 +235,7 @@ void _agregarColaboradorShowDialog(
                 DropdownButtonFormField<int>(
                   decoration: const InputDecoration(labelText: 'Cargo'),
                   value: selectedCargoId,
-                  items: _cargos
+                  items: cargos
                       .map((cargo) => DropdownMenuItem<int>(
                             value: cargo['id'],
                             child: Text(cargo['descripcion']),
@@ -303,7 +303,7 @@ void _agregarColaboradorShowDialog(
                       ),
                       const SizedBox(height: 8),
                       ElevatedButton(
-                        onPressed: _openStreetMapScreen,
+                        onPressed: openStreetMapScreen,
                         child: Text('Seleccionar Ubicación en el Mapa'),
                       ),
                     ],
@@ -338,7 +338,7 @@ void _agregarColaboradorShowDialog(
                       fechaNacimiento: selectedBirthDate!,
                       latitud: selectedLocation!.latitude,
                       longitud: selectedLocation!.longitude,
-                      cargoDescripcion: _cargos
+                      cargoDescripcion: cargos
                           .firstWhere((cargo) => cargo['id'] == selectedCargoId)['descripcion']!,
                       cargoId: selectedCargoId!,
                       direccion: direccionController.text,

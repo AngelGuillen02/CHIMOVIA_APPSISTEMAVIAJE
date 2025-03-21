@@ -3,6 +3,10 @@ import 'package:chimovia_appmovil/modules/colaboradores/bloc/colaboradores_bloc_
 import 'package:chimovia_appmovil/modules/colaboradores/infraestructure/datasource/colaboradores_datasoruce_implementacion.dart';
 import 'package:chimovia_appmovil/modules/colaboradores/infraestructure/repository/colaborador_repository_implementacion.dart';
 import 'package:chimovia_appmovil/modules/colaboradores/presentation/colaboradores_screen.dart';
+import 'package:chimovia_appmovil/modules/viajes/bloc/viajes_bloc_bloc.dart';
+import 'package:chimovia_appmovil/modules/viajes/infraestructure/datasource/viajes_datasource_implementacion.dart';
+import 'package:chimovia_appmovil/modules/viajes/infraestructure/repository/viaje_repository_implementacion.dart';
+import 'package:chimovia_appmovil/modules/viajes/presentation/viajes_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -61,16 +65,23 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _screens = [
     const home_screens(),
-    Builder(
-      builder: (context) {
-        return BlocProvider(
-          create: (context) => ColaboradoresBloc(repository: ColaboradoresRepositoryImpl(dataSource: ColaboradoresDataSourceImpl())),
-          child: ColaboradorsScreen(),
-        );
-      },
+    BlocProvider(
+      create: (context) => ColaboradoresBloc(
+        repository: ColaboradoresRepositoryImpl(
+          dataSource: ColaboradoresDataSourceImpl(),
+        ),
+      ),
+      child: ColaboradorsScreen(),
     ),
     const AsignacionesScreen(),
-    const ViajesScreen(),
+    BlocProvider(
+      create: (context) => ViajesBlocBloc(
+        repository: ViajesRepositoryImpl(
+          dataSource: ViajesDataSourceImpl(),
+        ),
+      ),
+      child: ViajesScreen(), 
+    ),
   ];
 
   void _onItemTapped(int index) {
@@ -85,12 +96,11 @@ class _MainScreenState extends State<MainScreen> {
     return MultiBlocListener(
       listeners: [
         BlocListener<ColaboradoresBloc, ColaboradoresState>(
-          listener: (context, state) {
-            // TODO: implement listener
-          },
+          listener: (context, state) {},
         ),
-
-        //Agregar nuevos bloc listener aqui
+        BlocListener<ViajesBlocBloc, ViajesBlocState>(
+          listener: (context, state) {},
+        ),
       ],
       child: Scaffold(
         key: _scaffoldKey,
@@ -127,6 +137,7 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 }
+
 
 class AppDrawer extends StatelessWidget {
   final int selectedIndex;
@@ -249,7 +260,6 @@ class CollaboratorsScreenState extends StatelessWidget {
       child: Text(
         "Pantalla de Colaboradores",
         style: TextStyle(color: Colors.black),
-        //context.go('/colaboradores');
       ),
     );
   }
@@ -269,13 +279,13 @@ class AsignacionesScreen extends StatelessWidget {
   }
 }
 
-class ViajesScreen extends StatelessWidget {
-  const ViajesScreen({super.key});
+// class ViajesScreen extends StatelessWidget {
+//   const ViajesScreen({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text("Pantalla de Viajes", style: TextStyle(color: Colors.black)),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return const Center(
+//       child: Text("Pantalla de Viajes", style: TextStyle(color: Colors.black)),
+//     );
+//   }
+// }
