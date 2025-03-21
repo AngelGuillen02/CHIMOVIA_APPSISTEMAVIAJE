@@ -7,12 +7,12 @@ abstract class ColaboradoresState {}
 
 class ColaboradoresInicial extends ColaboradoresState {}
 
-class ColaboradoresLoading extends ColaboradoresState {}
+class ColaboradoresCargados extends ColaboradoresState {}
 
-class ColaboradoresLoaded extends ColaboradoresState {
+class ColaboradoresCargadosLista extends ColaboradoresState {
   final List<Dato> colaboradores;
 
-  ColaboradoresLoaded({required this.colaboradores});
+  ColaboradoresCargadosLista({required this.colaboradores});
 }
 
 class ColaboradoresError extends ColaboradoresState {

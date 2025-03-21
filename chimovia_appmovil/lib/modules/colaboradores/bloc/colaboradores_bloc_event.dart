@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 @immutable
 abstract class ColaboradoresEvent {}
 
-class LoadColaboradores extends ColaboradoresEvent {}
+class CargarColaboradores extends ColaboradoresEvent {}
 
-class AddColaborador extends ColaboradoresEvent {
+class AgregarColaborador extends ColaboradoresEvent {
 final Colaboradores colaborador;
 
-  AddColaborador({required this.colaborador});
+  AgregarColaborador({required this.colaborador});
 }

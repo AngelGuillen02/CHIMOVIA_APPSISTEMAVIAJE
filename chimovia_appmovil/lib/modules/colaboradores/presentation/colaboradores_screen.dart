@@ -1,27 +1,39 @@
+
+
 import 'package:chimovia_appmovil/modules/colaboradores/bloc/colaboradores_bloc_bloc.dart';
 import 'package:chimovia_appmovil/modules/colaboradores/bloc/colaboradores_bloc_event.dart';
 import 'package:chimovia_appmovil/modules/colaboradores/bloc/colaboradores_bloc_state.dart';
 import 'package:chimovia_appmovil/modules/colaboradores/domain/entities/colaborador.dart';
 import 'package:chimovia_appmovil/modules/colaboradores/presentation/widgets/lista_colaboradores.dart';
+import 'package:chimovia_appmovil/modules/colaboradores/presentation/widgets/mapa_colaborador.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 
-class CollaboratorsScreen extends StatefulWidget {
-  const CollaboratorsScreen({super.key});
+import 'package:intl/intl.dart';
+import 'package:latlong2/latlong.dart';
+
+class ColaboradorsScreen extends StatefulWidget {
+  const ColaboradorsScreen({super.key});
 
   @override
-  CollaboratorsScreenState createState() => CollaboratorsScreenState();
+  ColaboradorsScreenState createState() => ColaboradorsScreenState();
 }
 
-class CollaboratorsScreenState extends State<CollaboratorsScreen> {
-  final TextEditingController _searchController = TextEditingController();
-  String _searchQuery = '';
+class ColaboradorsScreenState extends State<ColaboradorsScreen> {
+  final TextEditingController _buscarController = TextEditingController();
+  String _buscarQuery = '';
+
+ void _onDistanceCalculated(double distance) {
+    setState(() {
+      _calculatedDistance = distance;
+    });
+  }
+  double? _calculatedDistance; 
 
   void agregarColaborador(Colaboradores colaborador) {
     context.read<ColaboradoresBloc>().add(
-      AddColaborador(colaborador: colaborador),
+      AgregarColaborador(colaborador: colaborador),
     );
     setState(() {});
   }
@@ -29,19 +41,19 @@ class CollaboratorsScreenState extends State<CollaboratorsScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<ColaboradoresBloc>().add(LoadColaboradores());
+    context.read<ColaboradoresBloc>().add(CargarColaboradores());
   }
 
-  List<Dato> get _filteredCollaborators {
-    final currentState = context.read<ColaboradoresBloc>().state;
-    if (currentState is ColaboradoresLoaded) {
-      if (_searchQuery.isEmpty) {
-        return currentState.colaboradores;
+  List<Dato> get _filtrarcolaborador {
+    final estadoActual = context.read<ColaboradoresBloc>().state;
+    if (estadoActual is ColaboradoresCargadosLista) {
+      if (_buscarQuery.isEmpty) {
+        return estadoActual.colaboradores;
       }
-      return currentState.colaboradores.where((collaborator) {
-        final String fullName =
+      return estadoActual.colaboradores.where((collaborator) {
+        final String nombreCompleto =
             '${collaborator.nombre} ${collaborator.apellido}'.toLowerCase();
-        return fullName.contains(_searchQuery.toLowerCase());
+        return nombreCompleto.contains(_buscarQuery.toLowerCase());
       }).toList();
     }
     return [];
@@ -55,7 +67,7 @@ class CollaboratorsScreenState extends State<CollaboratorsScreen> {
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(SnackBar(content: Text(state.message)));
-        } else if (state is ColaboradoresLoaded) {
+        } else if (state is ColaboradoresCargadosLista) {
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(SnackBar(content: Text('Colaboradores actualizados')));
@@ -72,17 +84,17 @@ class CollaboratorsScreenState extends State<CollaboratorsScreen> {
             ),
             body: Column(
               children: [
-                _buildSearchBar(),
+                _barraBuscar(),
                 Expanded(
                   child: ListaColaboradores(
-                    colaboradoresFiltrados: _filteredCollaborators,
+                    colaboradoresFiltrados: _filtrarcolaborador,
                   ),
                 ),
               ],
             ),
             floatingActionButton: FloatingActionButton(
               onPressed:
-                  () => _showAddCollaboratorDialog(context, agregarColaborador),
+                  () => _agregarColaboradorShowDialog(context, agregarColaborador),
               backgroundColor: Theme.of(context).colorScheme.secondary,
               elevation: 4,
               child: Icon(Icons.add, size: 28),
@@ -93,7 +105,7 @@ class CollaboratorsScreenState extends State<CollaboratorsScreen> {
     );
   }
 
- void _showAddCollaboratorDialog(
+void _agregarColaboradorShowDialog(
     BuildContext context,
     Function(Colaboradores) onAdd,
 ) {
@@ -104,17 +116,33 @@ class CollaboratorsScreenState extends State<CollaboratorsScreen> {
   final telefonoController = TextEditingController();
   final emailController = TextEditingController();
   final fechaController = TextEditingController();
+  final direccionController = TextEditingController();
   String? selectedGender;
-  final cargoController = TextEditingController();
-  final latitudController = TextEditingController();
-  final longitudController = TextEditingController();
-  DateTime? selectedBirthDate;
   int? selectedCargoId;
+  DateTime? selectedBirthDate;
+  LatLng? selectedLocation;
 
   final List<Map<String, dynamic>> _cargos = [
     {"id": 3, "descripcion": "Chofer"},
     {"id": 2, "descripcion": "Gerente"},
   ];
+
+  void _openStreetMapScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => OpenStreetMapScreen(
+          onLocationSelected: (LatLng point, String address) {
+            
+            setState(() {
+              selectedLocation = point;
+              direccionController.text = address;
+            });
+          },
+        ),
+      ),
+    );
+  }
 
   showDialog(
     context: context,
@@ -122,6 +150,7 @@ class CollaboratorsScreenState extends State<CollaboratorsScreen> {
       title: const Text('Agregar Colaborador'),
       content: Container(
         width: MediaQuery.of(context).size.width * 0.9,
+        height: MediaQuery.of(context).size.height * 0.8,
         child: Form(
           key: formKey,
           child: SingleChildScrollView(
@@ -148,13 +177,11 @@ class CollaboratorsScreenState extends State<CollaboratorsScreen> {
                     return null;
                   },
                 ),
-               TextFormField(
+                TextFormField(
                   controller: identidadController,
                   decoration: const InputDecoration(labelText: 'Identidad'),
                   keyboardType: TextInputType.number,
-                  inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
-                  ],
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return 'La identidad es requerida';
@@ -169,9 +196,7 @@ class CollaboratorsScreenState extends State<CollaboratorsScreen> {
                   controller: telefonoController,
                   decoration: const InputDecoration(labelText: 'Telefono'),
                   keyboardType: TextInputType.number,
-                  inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
-                  ],
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   validator: (value) {
                     if (value != null && value.isNotEmpty && value.length < 8) {
                       return 'El número de teléfono debe tener al menos 8 dígitos';
@@ -199,50 +224,30 @@ class CollaboratorsScreenState extends State<CollaboratorsScreen> {
                   decoration: const InputDecoration(labelText: 'Sexo'),
                   value: selectedGender,
                   items: ['M', 'F']
-                      .map(
-                        (gender) => DropdownMenuItem(
-                          value: gender,
-                          child: Text(
-                            gender == 'M' ? 'Masculino' : 'Femenino',
-                          ),
-                        ),
-                      )
+                      .map((gender) => DropdownMenuItem(
+                            value: gender,
+                            child: Text(gender == 'M' ? 'Masculino' : 'Femenino'),
+                          ))
                       .toList(),
-                  onChanged: (value) {
-                    selectedGender = value;
-                  },
-                  validator: (value) {
-                    if (value == null || (value != 'M' && value != 'F')) {
-                      return 'Seleccione un sexo válido (M o F)';
-                    }
-                    return null;
-                  },
+                  onChanged: (value) => selectedGender = value,
+                  validator: (value) => value == null ? 'Seleccione un sexo válido (M o F)' : null,
                 ),
                 DropdownButtonFormField<int>(
                   decoration: const InputDecoration(labelText: 'Cargo'),
                   value: selectedCargoId,
-                  items: _cargos.map((cargo) {
-                    return DropdownMenuItem<int>(
-                      value: cargo['id'],
-                      child: Text(cargo['descripcion']),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    selectedCargoId = value;
-                  },
-                  validator: (value) {
-                    if (value == null || value <= 0) {
-                      return 'Seleccione un cargo válido';
-                    }
-                    return null;
-                  },
+                  items: _cargos
+                      .map((cargo) => DropdownMenuItem<int>(
+                            value: cargo['id'],
+                            child: Text(cargo['descripcion']),
+                          ))
+                      .toList(),
+                  onChanged: (value) => selectedCargoId = value,
+                  validator: (value) => value == null ? 'Seleccione un cargo válido' : null,
                 ),
                 TextFormField(
                   controller: fechaController,
                   readOnly: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Fecha de Nacimiento',
-                  ),
+                  decoration: const InputDecoration(labelText: 'Fecha de Nacimiento'),
                   onTap: () async {
                     final selectedDate = await showDatePicker(
                       context: context,
@@ -252,8 +257,7 @@ class CollaboratorsScreenState extends State<CollaboratorsScreen> {
                     );
                     if (selectedDate != null) {
                       selectedBirthDate = selectedDate;
-                      fechaController.text = 
-                          DateFormat('dd/MM/yyyy').format(selectedDate);
+                      fechaController.text = DateFormat('dd/MM/yyyy').format(selectedDate);
                     }
                   },
                   validator: (value) {
@@ -271,33 +275,39 @@ class CollaboratorsScreenState extends State<CollaboratorsScreen> {
                     return null;
                   },
                 ),
-                TextFormField(
-                  controller: latitudController,
-                  decoration: const InputDecoration(labelText: 'Latitud'),
-                  keyboardType: TextInputType.number,
-                  validator: (value) {
-                    if (value != null && value.isNotEmpty) {
-                      final lat = double.tryParse(value);
-                      if (lat != null && (lat < -90 || lat > 90)) {
-                        return 'Latitud debe estar entre -90 y 90';
-                      }
-                    }
-                    return null;
-                  },
-                ),
-                TextFormField(
-                  controller: longitudController,
-                  decoration: const InputDecoration(labelText: 'Longitud'),
-                  keyboardType: TextInputType.number,
-                  validator: (value) {
-                    if (value != null && value.isNotEmpty) {
-                      final lon = double.tryParse(value);
-                      if (lon != null && (lon < -180 || lon > 180)) {
-                        return 'Longitud debe estar entre -180 y 180';
-                      }
-                    }
-                    return null;
-                  },
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Ubicación del Colaborador",
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                      const SizedBox(height: 8),
+                      TextFormField(
+                        controller: direccionController,
+                        decoration: const InputDecoration(
+                          labelText: 'Dirección',
+                          hintText: 'Seleccione una ubicación en el mapa',
+                          border: OutlineInputBorder(),
+                        ),
+                        maxLines: 2,
+                        readOnly: true,
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Por favor seleccione una ubicación';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 8),
+                      ElevatedButton(
+                        onPressed: _openStreetMapScreen,
+                        child: Text('Seleccionar Ubicación en el Mapa'),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -312,9 +322,7 @@ class CollaboratorsScreenState extends State<CollaboratorsScreen> {
         ElevatedButton(
           onPressed: () {
             if (formKey.currentState!.validate()) {
-              if (selectedGender != null &&
-                  selectedCargoId != null &&
-                  selectedBirthDate != null) {
+              if (selectedGender != null && selectedCargoId != null && selectedBirthDate != null && selectedLocation != null) {
                 final nuevoColaborador = Colaboradores(
                   valido: true,
                   mensaje: 'Colaborador agregado',
@@ -328,15 +336,12 @@ class CollaboratorsScreenState extends State<CollaboratorsScreen> {
                       email: emailController.text,
                       sexo: selectedGender!,
                       fechaNacimiento: selectedBirthDate!,
-                      latitud: latitudController.text.isEmpty 
-                          ? null 
-                          : double.parse(latitudController.text),
-                      longitud: longitudController.text.isEmpty 
-                          ? null 
-                          : double.parse(longitudController.text),
+                      latitud: selectedLocation!.latitude,
+                      longitud: selectedLocation!.longitude,
                       cargoDescripcion: _cargos
                           .firstWhere((cargo) => cargo['id'] == selectedCargoId)['descripcion']!,
                       cargoId: selectedCargoId!,
+                      direccion: direccionController.text,
                     ),
                   ],
                 );
@@ -344,9 +349,7 @@ class CollaboratorsScreenState extends State<CollaboratorsScreen> {
                 Navigator.pop(context);
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Por favor, seleccione todos los campos.'),
-                  ),
+                  const SnackBar(content: Text('Por favor, complete todos los campos requeridos.')),
                 );
               }
             }
@@ -357,8 +360,7 @@ class CollaboratorsScreenState extends State<CollaboratorsScreen> {
     ),
   );
 }
-
-  Widget _buildSearchBar() {
+  Widget _barraBuscar() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Container(
@@ -374,23 +376,23 @@ class CollaboratorsScreenState extends State<CollaboratorsScreen> {
           ],
         ),
         child: TextField(
-          controller: _searchController,
+          controller: _buscarController,
           onChanged: (value) {
             setState(() {
-              _searchQuery = value;
+              _buscarQuery = value;
             });
           },
           decoration: InputDecoration(
             hintText: 'Buscar colaborador',
             prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
             suffixIcon:
-                _searchQuery.isNotEmpty
+                _buscarQuery.isNotEmpty
                     ? IconButton(
                       icon: Icon(Icons.clear, color: Colors.grey[600]),
                       onPressed: () {
-                        _searchController.clear();
+                        _buscarController.clear();
                         setState(() {
-                          _searchQuery = '';
+                          _buscarQuery = '';
                         });
                         FocusScope.of(context).unfocus();
                       },

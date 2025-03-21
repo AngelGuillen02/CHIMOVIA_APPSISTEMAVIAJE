@@ -7,7 +7,6 @@ part 'viajes_bloc_state.dart';
 class ViajesBlocBloc extends Bloc<ViajesBlocEvent, ViajesBlocState> {
   ViajesBlocBloc() : super(ViajesBlocInitial()) {
     on<ViajesBlocEvent>((event, emit) {
-      // TODO: implement event handler
     });
   }
 }

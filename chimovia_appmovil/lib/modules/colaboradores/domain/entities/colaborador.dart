@@ -41,6 +41,7 @@ class Dato {
   double? longitud;
   String cargoDescripcion;
   int cargoId;
+  final String? direccion;
 
   Dato({
     required this.colaboradorId,
@@ -55,6 +56,7 @@ class Dato {
     required this.longitud,
     required this.cargoDescripcion,
     required this.cargoId,
+    this.direccion,
   });
 
   factory Dato.fromJson(Map<String, dynamic> json) => Dato(

@@ -9,26 +9,26 @@ class ColaboradoresBloc extends Bloc<ColaboradoresEvent, ColaboradoresState> {
 
   ColaboradoresBloc({required this.repository})
     : super(ColaboradoresInicial()) {
-    on<LoadColaboradores>((event, emit) async {
-      emit(ColaboradoresLoading());
+    on<CargarColaboradores>((event, emit) async {
+      emit(ColaboradoresCargados());
       try {
         final colaboradores = await repository.getColaboradores();
         final listadoDatos =
             colaboradores.expand((colaborador) => colaborador.datos).toList();
-        emit(ColaboradoresLoaded(colaboradores: listadoDatos));
+        emit(ColaboradoresCargadosLista(colaboradores: listadoDatos));
       } catch (e) {
         emit(ColaboradoresError(message: e.toString()));
       }
     });
 
-    on<AddColaborador>((event, emit) async {
-      emit(ColaboradoresLoading());
+    on<AgregarColaborador>((event, emit) async {
+      emit(ColaboradoresCargados());
       try {
         await repository.addColaborador(event.colaborador);
         final colaboradores = await repository.getColaboradores();
         final listadoDatos =
             colaboradores.expand((colaborador) => colaborador.datos).toList();
-        emit(ColaboradoresLoaded(colaboradores: listadoDatos));
+        emit(ColaboradoresCargadosLista(colaboradores: listadoDatos));
       } catch (e) {
         emit(ColaboradoresError(message: e.toString()));
       }

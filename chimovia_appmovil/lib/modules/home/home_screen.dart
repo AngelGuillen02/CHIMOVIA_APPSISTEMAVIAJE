@@ -41,7 +41,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// Colores para la aplicación
 const primaryColor = Color(0xFF72A6F8);
 const scaffoldBackgroundColor = Color.fromARGB(255, 220, 220, 220);
 const accentColor = Color(0xFF6B7FD7);
@@ -66,7 +65,7 @@ class _MainScreenState extends State<MainScreen> {
       builder: (context) {
         return BlocProvider(
           create: (context) => ColaboradoresBloc(repository: ColaboradoresRepositoryImpl(dataSource: ColaboradoresDataSourceImpl())),
-          child: CollaboratorsScreen(),
+          child: ColaboradorsScreen(),
         );
       },
     ),

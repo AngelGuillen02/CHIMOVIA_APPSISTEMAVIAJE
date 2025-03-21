@@ -24,11 +24,11 @@ class _ListaColaboradoresState extends State<ListaColaboradores> {
 Widget _construirListaColaborador(List<Dato> colaboradoresFiltrados) {
     return BlocBuilder<ColaboradoresBloc, ColaboradoresState>(
       builder: (context, state) {
-        if (state is ColaboradoresLoading) {
+        if (state is ColaboradoresCargados) {
           return Center(child: CircularProgressIndicator());
         } else if (state is ColaboradoresError) {
           return Center(child: Text(state.message));
-        } else if (state is ColaboradoresLoaded) {
+        } else if (state is ColaboradoresCargadosLista) {
           if (colaboradoresFiltrados.isEmpty) {
             return Center(
               child: Text(

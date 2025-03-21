@@ -5,7 +5,7 @@ import 'package:chimovia_appmovil/modules/login/presentation/login.dart';
 import 'package:chimovia_appmovil/modules/login/bloc/login_bloc_bloc.dart';
 import 'package:chimovia_appmovil/modules/login/infraestructure/datasource/login_datasource_implementacion.dart';
 import 'package:chimovia_appmovil/modules/login/infraestructure/repository/login_repository_implementacion.dart';
-import 'package:chimovia_appmovil/screen/home_screen.dart';
+import 'package:chimovia_appmovil/modules/home/home_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
