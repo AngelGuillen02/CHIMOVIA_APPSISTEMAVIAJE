@@ -1,3 +1,6 @@
+import 'package:chimovia_appmovil/modules/asignacion/bloc/asignaciones_bloc_bloc.dart';
+import 'package:chimovia_appmovil/modules/asignacion/infraestructure/datasource/asignacion_datasource_implementacion.dart';
+import 'package:chimovia_appmovil/modules/asignacion/infraestructure/repository/asignacion_repository_implementacion.dart';
 import 'package:chimovia_appmovil/modules/colaboradores/bloc/colaboradores_bloc_bloc.dart';
 import 'package:chimovia_appmovil/modules/colaboradores/infraestructure/datasource/colaboradores_datasoruce_implementacion.dart';
 import 'package:chimovia_appmovil/modules/login/presentation/login.dart';
@@ -41,6 +44,13 @@ final appRoutes = GoRouter(
             create: (context) => ViajesBlocBloc(
               repository: ViajesRepositoryImpl(
                 dataSource: ViajesDataSourceImpl(),
+              ),
+            ),
+          ),
+          BlocProvider(
+            create: (context) => AsignacionesBlocBloc(
+              repository: AsignacionesRepositoryImpl(
+                dataSource: AsignacionesDataSourceImpl(),
               ),
             ),
           ),

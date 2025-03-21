@@ -36,8 +36,8 @@ class Viajes {
         distanciaParcial: json["distancia_Parcial"]?.toDouble() ?? 0.0,
         fecha: DateTime.parse(json["fecha"]),
         horaLlegada: json["hora_Llegada"],
-        transportistaId: json["transportista_Id"] ?? 0, // Add if API returns it
-        sucursalId: json["sucursal_Id"] ?? 0,           // Add if API returns it
+        transportistaId: json["transportista_Id"] ?? 0, 
+        sucursalId: json["sucursal_Id"] ?? 0,           
         nombreUsuario: json["nombreUsuario"],
         usuarioId: json["usuario_Id"],
         detalles: List<Detalle>.from(json["detalles"].map((x) => Detalle.fromJson(x))),

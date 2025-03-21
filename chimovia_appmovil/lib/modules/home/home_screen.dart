@@ -1,3 +1,7 @@
+import 'package:chimovia_appmovil/modules/asignacion/bloc/asignaciones_bloc_bloc.dart';
+import 'package:chimovia_appmovil/modules/asignacion/infraestructure/datasource/asignacion_datasource_implementacion.dart';
+import 'package:chimovia_appmovil/modules/asignacion/infraestructure/repository/asignacion_repository_implementacion.dart';
+import 'package:chimovia_appmovil/modules/asignacion/presentation/asignacion_screen.dart';
 import 'package:chimovia_appmovil/modules/colaboradores/bloc/colaboradores_bloc_bloc.dart';
 import 'package:chimovia_appmovil/modules/colaboradores/bloc/colaboradores_bloc_state.dart';
 import 'package:chimovia_appmovil/modules/colaboradores/infraestructure/datasource/colaboradores_datasoruce_implementacion.dart';
@@ -24,10 +28,10 @@ class MyApp extends StatelessWidget {
       title: 'CHIMOVIA APP',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primaryColor: primaryColor,
+        primaryColor: colorPrimario,
         scaffoldBackgroundColor: scaffoldBackgroundColor,
         appBarTheme: const AppBarTheme(
-          backgroundColor: primaryColor,
+          backgroundColor: colorPrimario,
           elevation: 0,
         ),
         textTheme: const TextTheme(
@@ -45,12 +49,11 @@ class MyApp extends StatelessWidget {
   }
 }
 
-const primaryColor = Color(0xFF72A6F8);
-const scaffoldBackgroundColor = Color.fromARGB(255, 220, 220, 220);
+const colorPrimario = Color(0xFF72A6F8);
+const scaffoldBackgroundColor = Color.fromARGB(255, 108, 49, 49);
 const accentColor = Color(0xFF6B7FD7);
-const textColor = Color.fromARGB(255, 0, 0, 0);
-const secondaryTextColor = Color.fromARGB(255, 0, 0, 0);
-const drawerColor = Color(0xFF568DF5);
+const colorTexto = Color.fromARGB(255, 0, 0, 0);
+const sidebarColor = Color(0xFF568DF5);
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -66,25 +69,36 @@ class _MainScreenState extends State<MainScreen> {
   final List<Widget> _screens = [
     const home_screens(),
     BlocProvider(
-      create: (context) => ColaboradoresBloc(
-        repository: ColaboradoresRepositoryImpl(
-          dataSource: ColaboradoresDataSourceImpl(),
-        ),
-      ),
+      create:
+          (context) => ColaboradoresBloc(
+            repository: ColaboradoresRepositoryImpl(
+              dataSource: ColaboradoresDataSourceImpl(),
+            ),
+          ),
       child: ColaboradorsScreen(),
     ),
-    const AsignacionesScreen(),
-    BlocProvider(
-      create: (context) => ViajesBlocBloc(
-        repository: ViajesRepositoryImpl(
-          dataSource: ViajesDataSourceImpl(),
-        ),
-      ),
-      child: ViajesScreen(), 
+      BlocProvider(
+      create:
+          (context) => AsignacionesBlocBloc(
+            repository: AsignacionesRepositoryImpl(
+              dataSource: AsignacionesDataSourceImpl(),
+            ),
+          ),
+      child: AsignacionesScreen(),
     ),
+    BlocProvider(
+      create:
+          (context) => ViajesBlocBloc(
+            repository: ViajesRepositoryImpl(
+              dataSource: ViajesDataSourceImpl(),
+            ),
+          ),
+      child: ViajesScreen(),
+    ),
+      
   ];
 
-  void _onItemTapped(int index) {
+  void _alPrecionarlo(int index) {
     setState(() {
       _selectedIndex = index;
     });
@@ -101,11 +115,14 @@ class _MainScreenState extends State<MainScreen> {
         BlocListener<ViajesBlocBloc, ViajesBlocState>(
           listener: (context, state) {},
         ),
+         BlocListener<AsignacionesBlocBloc, AsignacionesBlocState>(
+          listener: (context, state) {},
+        ),
       ],
       child: Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
-          title: _getTitleForIndex(_selectedIndex),
+          title: _tituloIndice(_selectedIndex),
           leading: IconButton(
             icon: const Icon(Icons.menu, color: Color.fromARGB(255, 0, 0, 0)),
             onPressed: () {
@@ -115,14 +132,14 @@ class _MainScreenState extends State<MainScreen> {
         ),
         drawer: AppDrawer(
           selectedIndex: _selectedIndex,
-          onItemSelected: _onItemTapped,
+          onItemSelected: _alPrecionarlo,
         ),
         body: _screens[_selectedIndex],
       ),
     );
   }
 
-  Widget _getTitleForIndex(int index) {
+  Widget _tituloIndice(int index) {
     switch (index) {
       case 0:
         return const Text('Inicio');
@@ -138,7 +155,6 @@ class _MainScreenState extends State<MainScreen> {
   }
 }
 
-
 class AppDrawer extends StatelessWidget {
   final int selectedIndex;
   final Function(int) onItemSelected;
@@ -153,7 +169,7 @@ class AppDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Drawer(
       child: Container(
-        color: drawerColor,
+        color: sidebarColor,
         child: Column(
           children: [
             const SizedBox(height: 80),
@@ -161,23 +177,23 @@ class AppDrawer extends StatelessWidget {
               child: ListView(
                 padding: EdgeInsets.zero,
                 children: [
-                  _buildDrawerItem(
+                  _elementoSidebar(
                     icon: Icons.home_outlined,
                     title: 'Inicio',
                     index: 0,
                   ),
-                  _buildDrawerItem(
-                    icon: Icons.search_outlined,
+                  _elementoSidebar(
+                    icon: Icons.people_outline,
                     title: 'Colaboradores',
                     index: 1,
                   ),
-                  _buildDrawerItem(
-                    icon: Icons.people_outline,
+                  _elementoSidebar(
+                    icon: Icons.app_registration,
                     title: 'Asignaciones',
                     index: 2,
                   ),
-                  _buildDrawerItem(
-                    icon: Icons.favorite_border_outlined,
+                  _elementoSidebar(
+                    icon: Icons.bus_alert_outlined,
                     title: 'Viajes',
                     index: 3,
                   ),
@@ -195,15 +211,42 @@ class AppDrawer extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
               child: Row(
                 children: [
-                  const Icon(Icons.logout, color: secondaryTextColor),
+                  const Icon(Icons.logout, color: colorTexto),
                   const SizedBox(width: 10),
                   GestureDetector(
-                    onTap: () {
-                      context.go('/');
+                    onTap: () async {
+                      final bool? confirmLogout = await showDialog<bool>(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('Cerrar sesión'),
+                            content: const Text(
+                              '¿Estás seguro de que deseas cerrar sesión?',
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop(false);
+                                },
+                                child: const Text('Cancelar'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop(true);
+                                },
+                                child: const Text('Aceptar'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                      if (confirmLogout ?? false) {
+                        context.go('/');
+                      }
                     },
                     child: const Text(
                       'Cerrar sesión',
-                      style: TextStyle(color: secondaryTextColor),
+                      style: TextStyle(color: colorTexto),
                     ),
                   ),
                 ],
@@ -215,18 +258,18 @@ class AppDrawer extends StatelessWidget {
     );
   }
 
-  Widget _buildDrawerItem({
+  Widget _elementoSidebar({
     required IconData icon,
     required String title,
     required int index,
   }) {
     final bool isSelected = selectedIndex == index;
     return ListTile(
-      leading: Icon(icon, color: isSelected ? accentColor : secondaryTextColor),
+      leading: Icon(icon, color: isSelected ? const Color.fromARGB(255, 0, 0, 0) : colorTexto),
       title: Text(
         title,
         style: TextStyle(
-          color: isSelected ? textColor : secondaryTextColor,
+          color: isSelected ? colorTexto : colorTexto,
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
         ),
       ),
@@ -239,53 +282,78 @@ class AppDrawer extends StatelessWidget {
   }
 }
 
-// Pantallas individuales
 class home_screens extends StatelessWidget {
   const home_screens({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text("Pantalla de Inicio", style: TextStyle(color: Colors.black)),
-    );
-  }
-}
-
-class CollaboratorsScreenState extends StatelessWidget {
-  const CollaboratorsScreenState({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text(
-        "Pantalla de Colaboradores",
-        style: TextStyle(color: Colors.black),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Pantalla de Inicio"),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            // Card(
+            //   shape: RoundedRectangleBorder(
+            //     borderRadius: BorderRadius.circular(12),
+            //   ),
+            //   elevation: 4,
+            //   margin: const EdgeInsets.only(bottom: 16),
+            //   child: ListTile(
+            //     contentPadding: const EdgeInsets.all(16),
+            //     title: const Text(
+            //       "Pantalla de Asignaciones",
+            //       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            //     ),
+            //     subtitle: const Text(
+            //       "En esta pantalla podrás ver y gestionar todas las asignaciones de los colaboradores a las sucursales. Podrás revisar el estado de cada asignación, asignar nuevos colaboradores y realizar cambios en tiempo real.",
+            //       style: TextStyle(fontSize: 14),
+            //     ),
+            //   ),
+            // ),
+            Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 4,
+              margin: const EdgeInsets.only(bottom: 16),
+              child: ListTile(
+                contentPadding: const EdgeInsets.all(16),
+                title: const Text(
+                  "Pantalla de Colaboradores",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                ),
+                subtitle: const Text(
+                  "En esta pantalla podrás gestionar todos los colaboradores de la plataforma. Se pueden agregar nuevos colaboradores, con la facilidad que la tecnologia no ofrece.",
+                  style: TextStyle(fontSize: 14),
+                ),
+              ),
+            ),
+            Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 4,
+              margin: const EdgeInsets.only(bottom: 16),
+              child: ListTile(
+                contentPadding: const EdgeInsets.all(16),
+                title: const Text(
+                  "Pantalla de Viajes",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                ),
+                subtitle: const Text(
+                  "Esta pantalla está dedicada a la gestión de viajes. Permite crear viajes y hacer seguimiento de los viajes de los colaboradores, incluyendo detalles como la ruta, el tiempo estimado y el estado del viaje.",
+                  style: TextStyle(fontSize: 14),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-class AsignacionesScreen extends StatelessWidget {
-  const AsignacionesScreen({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text(
-        "Pantalla de Asignaciones",
-        style: TextStyle(color: Colors.black),
-      ),
-    );
-  }
-}
-
-// class ViajesScreen extends StatelessWidget {
-//   const ViajesScreen({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return const Center(
-//       child: Text("Pantalla de Viajes", style: TextStyle(color: Colors.black)),
-//     );
-//   }
-// }

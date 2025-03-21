@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -27,6 +28,8 @@ class ViajesScreenState extends State<ViajesScreen> {
   void initState() {
     super.initState();
     context.read<ViajesBlocBloc>().add(CargarViajes());
+      SystemChannels.textInput.invokeMethod('TextInput.hide');
+
   }
 
   List<Viajes> get _filtrarViaje {
@@ -178,12 +181,10 @@ class _AgregarViajeDialogState extends State<_AgregarViajeDialog> {
         ),
         headers: {'Content-Type': 'application/json'},
       );
-      debugPrint('Transportistas Response Status: ${response.statusCode}');
-      debugPrint('Transportistas Response Body: ${response.body}');
+ 
 
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
-        debugPrint('Transportistas Decoded Data: $data');
 
         setState(() {
           transportistas = List<Map<String, dynamic>>.from(data);
@@ -202,12 +203,10 @@ class _AgregarViajeDialogState extends State<_AgregarViajeDialog> {
         Uri.parse('${EnviromentApi.apiUrl}/Sucursales/ListadoSucursales'),
         headers: {'Content-Type': 'application/json'},
       );
-      debugPrint('Sucursales Response Status: ${response.statusCode}');
-      debugPrint('Sucursales Response Body: ${response.body}');
+
 
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
-        debugPrint('Sucursales Decoded Data: $data');
 
         setState(() {
           sucursales = List<Map<String, dynamic>>.from(data);
@@ -226,14 +225,11 @@ class _AgregarViajeDialogState extends State<_AgregarViajeDialog> {
         Uri.parse('${EnviromentApi.apiUrl}/colaboradores/ListadoColaboradores'),
         headers: {'Content-Type': 'application/json'},
       );
-      debugPrint('Colaboradores Response Status: ${response.statusCode}');
-      debugPrint('Colaboradores Response Body: ${response.body}');
+     
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        debugPrint('Colaboradores Decoded Data: $data');
-        debugPrint('Colaboradores "datos" Type: ${data['datos'].runtimeType}');
-
+   
         if (data['datos'] is String) {
           final decodedDatos = jsonDecode(data['datos'] as String);
           if (decodedDatos is List) {
@@ -442,20 +438,20 @@ class _AgregarViajeDialogState extends State<_AgregarViajeDialog> {
               final nuevoViaje = Viajes(
                 viajeId: 0,
                 descripcion: descripcionController.text,
-                distanciaParcial: 0.0, // Calculated server-side
+                distanciaParcial: 0.0,
                 fecha: DateTime.parse(fechaController.text),
                 horaLlegada: horaLlegadaController.text,
                 transportistaId: selectedTransportistaId!,
                 sucursalId: selectedSucursalId!,
-                nombreUsuario: 'Usuario Actual', // Replace with real user data
-                usuarioId: 1, // Replace with real user ID
+                nombreUsuario: 'Usuario Actual', 
+                usuarioId: 1, 
                 detalles:
                     selectedColaboradores
                         .map(
                           (id) => Detalle(
                             viajeDetalleId: 0,
-                            distanciaTotal: 0.0, // Calculated server-side
-                            costo: 0.0, // Calculated server-side
+                            distanciaTotal: 0.0, 
+                            costo: 0.0, 
                             fecha: DateTime.parse(fechaController.text),
                             solicitudViajeId: null,
                             viajeId: 0,

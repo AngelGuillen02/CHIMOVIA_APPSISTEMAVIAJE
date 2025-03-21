@@ -1,13 +1,56 @@
+import 'package:chimovia_appmovil/config/enviroment.dart';
 import 'package:flutter/material.dart';
 import 'package:chimovia_appmovil/modules/viajes/domain/entities/viajes.dart';
+import 'package:intl/intl.dart';
+import 'package:dio/dio.dart';
 
-class CardViajes extends StatelessWidget {
+class CardViajes extends StatefulWidget {
   final Viajes viaje;
 
   const CardViajes({super.key, required this.viaje});
 
   @override
+  _CardViajesState createState() => _CardViajesState();
+}
+
+class _CardViajesState extends State<CardViajes> {
+  String nombreSucursal = "Cargando...";
+
+  @override
+  void initState() {
+    super.initState();
+    obtenerNombreSucursal(widget.viaje.sucursalId);
+  }
+
+  Future<void> obtenerNombreSucursal(int sucursalId) async {
+    try {
+      final response = await Dio().get(
+        '${EnviromentApi.apiUrl}/Sucursales/$sucursalId', // URL correcta
+        options: Options(headers: {'Content-Type': 'application/json'}),
+      );
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+        setState(() {
+          // Extraemos el nombre de la sucursal
+          nombreSucursal = data['nombre'] ?? 'Sucursal no encontrada';
+        });
+      } else {
+        setState(() {
+          nombreSucursal = 'Error al obtener sucursal';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        nombreSucursal = 'Error al obtener sucursal';
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final viaje = widget.viaje;
+
     return Card(
       margin: EdgeInsets.only(bottom: 16),
       elevation: 2,
@@ -27,7 +70,6 @@ class CardViajes extends StatelessWidget {
                   Text(viaje.descripcion, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                   SizedBox(height: 4),
                   Text(viaje.horaLlegada, style: TextStyle(fontSize: 13)),
-                  
                 ],
               ),
             ),
@@ -44,8 +86,20 @@ class CardViajes extends StatelessWidget {
           ),
         ),
         children: [
-          Text('Fecha: ${viaje.fecha.toIso8601String()}'),
-          Text('Distancia Parcial: ${viaje.distanciaParcial} km'),
+          Text('Fecha: ${DateFormat('dd/MM/yyyy').format(viaje.fecha)}'),
+          Text('Usuario: ${viaje.nombreUsuario}'),
+          Text('Sucursal: $nombreSucursal'),
+          for (var detalle in viaje.detalles)
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Distancia Total: ${detalle.distanciaTotal} km'),
+                  Text('Costo: L${detalle.costo}'),
+                ],
+              ),
+            ),
         ],
       ),
     );

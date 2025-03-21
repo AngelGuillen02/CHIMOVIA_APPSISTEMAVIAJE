@@ -6,7 +6,6 @@ import 'package:chimovia_appmovil/modules/viajes/domain/datasource/viajes_dataso
 import 'package:chimovia_appmovil/modules/viajes/domain/entities/viajes.dart';
 import 'package:dio/dio.dart';
 import 'package:chimovia_appmovil/config/enviroment.dart';
-import 'package:flutter/material.dart';
 
 class ViajesDataSourceImpl implements ViajesDatasource {
   final Dio _dio = Dio();
@@ -38,10 +37,8 @@ class ViajesDataSourceImpl implements ViajesDatasource {
       } else {
         errorMessage = 'Error al obtener viajes: ${e.message}';
       }
-      debugPrint('DioException: $errorMessage');
       throw CustomException(errorMessage);
     } on FormatException catch (e) {
-      debugPrint('FormatException: $e');
       throw CustomException('Error al parsear datos: $e');
     }
   }
@@ -54,14 +51,11 @@ class ViajesDataSourceImpl implements ViajesDatasource {
         queryParameters: {'usuarioCreacion': viaje.usuarioId}, 
         options: Options(headers: {'Content-Type': 'application/json'}),
       );
-      debugPrint('Add Viaje Response Status: ${response.statusCode}');
-      debugPrint('Add Viaje Response Data: ${response.data}');
       if (response.statusCode != RespuestasHttp.creado.codigo) {
         final errorMsg = response.data['mensaje'] ?? 'Error al agregar viaje';
         throw CustomException(errorMsg);
       }
     } on DioException catch (e) {
-      debugPrint('Add Viaje DioException: ${e.message}');
       final errorMsg = e.response?.data['mensaje'] ?? 'Error al agregar viaje: ${e.message}';
       throw CustomException(errorMsg);
     }

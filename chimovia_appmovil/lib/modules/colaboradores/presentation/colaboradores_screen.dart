@@ -24,7 +24,7 @@ class ColaboradorsScreenState extends State<ColaboradorsScreen> {
   final TextEditingController _buscarController = TextEditingController();
   String _buscarQuery = '';
 
- void _onDistanceCalculated(double distance) {
+ void _calcularDistancia(double distance) {
     setState(() {
       _calculatedDistance = distance;
     });
@@ -42,6 +42,8 @@ class ColaboradorsScreenState extends State<ColaboradorsScreen> {
   void initState() {
     super.initState();
     context.read<ColaboradoresBloc>().add(CargarColaboradores());
+      SystemChannels.textInput.invokeMethod('TextInput.hide');
+
   }
 
   List<Dato> get _filtrarcolaborador {

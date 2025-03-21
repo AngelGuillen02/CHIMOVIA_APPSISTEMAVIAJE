@@ -14,11 +14,11 @@ class FilaColaboradores extends StatefulWidget {
 class _FilaColaboradoresState extends State<FilaColaboradores> {
   @override
   Widget build(BuildContext context) {
-    return _buildInfoRow(widget.label, widget.value);
+    return _informacionFila(widget.label, widget.value);
   }
 }
 
-Widget _buildInfoRow(String label, String value) {
+Widget _informacionFila(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
