@@ -14,38 +14,13 @@ class CardViajes extends StatefulWidget {
 }
 
 class _CardViajesState extends State<CardViajes> {
-  String nombreSucursal = "Cargando...";
 
   @override
   void initState() {
     super.initState();
-    obtenerNombreSucursal(widget.viaje.sucursalId);
   }
 
-  Future<void> obtenerNombreSucursal(int sucursalId) async {
-    try {
-      final response = await Dio().get(
-        '${EnviromentApi.apiUrl}/Sucursales/$sucursalId', // URL correcta
-        options: Options(headers: {'Content-Type': 'application/json'}),
-      );
-
-      if (response.statusCode == 200) {
-        final data = response.data;
-        setState(() {
-          // Extraemos el nombre de la sucursal
-          nombreSucursal = data['nombre'] ?? 'Sucursal no encontrada';
-        });
-      } else {
-        setState(() {
-          nombreSucursal = 'Error al obtener sucursal';
-        });
-      }
-    } catch (e) {
-      setState(() {
-        nombreSucursal = 'Error al obtener sucursal';
-      });
-    }
-  }
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -88,7 +63,6 @@ class _CardViajesState extends State<CardViajes> {
         children: [
           Text('Fecha: ${DateFormat('dd/MM/yyyy').format(viaje.fecha)}'),
           Text('Usuario: ${viaje.nombreUsuario}'),
-          Text('Sucursal: $nombreSucursal'),
           for (var detalle in viaje.detalles)
             Padding(
               padding: const EdgeInsets.only(top: 8.0),

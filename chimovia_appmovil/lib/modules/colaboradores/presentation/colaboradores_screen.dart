@@ -125,8 +125,8 @@ void _agregarColaboradorShowDialog(
   LatLng? selectedLocation;
 
   final List<Map<String, dynamic>> cargos = [
-    {"id": 3, "descripcion": "Chofer"},
-    {"id": 2, "descripcion": "Gerente"},
+    {"id": 1, "descripcion": "Gerente"},
+    {"id": 2, "descripcion": "Colaborador"},
   ];
 
   void openStreetMapScreen() {

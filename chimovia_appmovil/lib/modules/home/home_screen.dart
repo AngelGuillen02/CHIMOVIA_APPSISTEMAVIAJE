@@ -122,9 +122,10 @@ class _MainScreenState extends State<MainScreen> {
       child: Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
+          backgroundColor: sidebarColor,
           title: _tituloIndice(_selectedIndex),
           leading: IconButton(
-            icon: const Icon(Icons.menu, color: Color.fromARGB(255, 0, 0, 0)),
+            icon: const Icon(Icons.menu, color: Color.fromARGB(255, 255, 255, 255)),
             onPressed: () {
               _scaffoldKey.currentState?.openDrawer();
             },
@@ -187,11 +188,7 @@ class AppDrawer extends StatelessWidget {
                     title: 'Colaboradores',
                     index: 1,
                   ),
-                  _elementoSidebar(
-                    icon: Icons.app_registration,
-                    title: 'Asignaciones',
-                    index: 2,
-                  ),
+              
                   _elementoSidebar(
                     icon: Icons.bus_alert_outlined,
                     title: 'Viajes',
@@ -295,24 +292,7 @@ class home_screens extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Card(
-            //   shape: RoundedRectangleBorder(
-            //     borderRadius: BorderRadius.circular(12),
-            //   ),
-            //   elevation: 4,
-            //   margin: const EdgeInsets.only(bottom: 16),
-            //   child: ListTile(
-            //     contentPadding: const EdgeInsets.all(16),
-            //     title: const Text(
-            //       "Pantalla de Asignaciones",
-            //       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            //     ),
-            //     subtitle: const Text(
-            //       "En esta pantalla podrás ver y gestionar todas las asignaciones de los colaboradores a las sucursales. Podrás revisar el estado de cada asignación, asignar nuevos colaboradores y realizar cambios en tiempo real.",
-            //       style: TextStyle(fontSize: 14),
-            //     ),
-            //   ),
-            // ),
+
             Card(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),

@@ -34,7 +34,27 @@ class _LoginScreenState extends State<LoginScreen> {
           });
         }
         if (state is LoginBlocSuccess) {
-          context.go('/menu');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                '¡Registro exitoso!',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                ),
+              ),
+              backgroundColor: const Color.fromARGB(255, 56, 107, 250),
+              duration: Duration(seconds: 2),
+              behavior: SnackBarBehavior.floating,
+              margin: EdgeInsets.all(8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          );
+          Future.delayed(Duration(seconds: 2), () {
+            context.go('/menu');
+          });
         }
         if (state is LoginBlocFailure) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -42,16 +62,14 @@ class _LoginScreenState extends State<LoginScreen> {
               content: Text(
                 state.message,
                 style: TextStyle(
-                  color: Colors.white, 
-                  fontSize: 14, 
+                  color: Colors.white,
+                  fontSize: 14,
                 ),
               ),
-              backgroundColor: Colors.red, 
-              duration: Duration(seconds: 3), 
-              behavior:
-                  SnackBarBehavior
-                      .floating, 
-              margin: EdgeInsets.all(10), 
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 2),
+              behavior: SnackBarBehavior.floating,
+              margin: EdgeInsets.all(10),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -144,9 +162,9 @@ class _LoginScreenState extends State<LoginScreen> {
           if (value == null || value.trim().isEmpty) {
             return 'Por favor ingrese un correo electrónico';
           }
-          // if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(value)) {
-          //   return 'Por favor ingrese un correo electrónico válido';
-          // }
+          if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(value)) {
+            return 'Por favor ingrese un correo electrónico válido';
+          }
           return null;
         },
       ),
@@ -169,21 +187,19 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           elevation: 5,
         ),
-        onPressed:
-            _isLoading
-                ? null
-                : () => _login(_emailController.text, _passwordController.text),
-        child:
-            _isLoading
-                ? const CircularProgressIndicator(color: Colors.white)
-                : const Text(
-                  "INICIAR SESIÓN",
-                  style: TextStyle(
-                    color: Color(0xFF1A237E),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
+        onPressed: _isLoading
+            ? null
+            : () => _login(_emailController.text, _passwordController.text),
+        child: _isLoading
+            ? const CircularProgressIndicator(color: Colors.white)
+            : const Text(
+                "INICIAR SESIÓN",
+                style: TextStyle(
+                  color: Color(0xFF1A237E),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
                 ),
+              ),
       ),
     );
   }
@@ -241,9 +257,6 @@ class _PasswordFieldState extends State<PasswordField> {
           if (value == null || value.trim().isEmpty) {
             return 'Por favor ingrese una contraseña';
           }
-          // if (value.length < 8) {
-          //   return 'La contraseña debe tener al menos 8 caracteres';
-          // }
           return null;
         },
       ),
